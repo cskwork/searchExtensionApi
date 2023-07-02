@@ -24,3 +24,9 @@ public class KakaoApiConfig {
                 .build();
     }
 }
+/*
+# TEST RUN
+curl -v -X GET "https://dapi.kakao.com/v2/search/blog" \
+--data-urlencode "query=https://brunch.co.kr/@tourism 집짓기" \
+-H "Authorization: KakaoAK ${REST_API_KEY}"
+*/
