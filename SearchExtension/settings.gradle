@@ -1,1 +1,3 @@
 rootProject.name = 'SearchExtension'
+// include 'apiSearchModule'
+// include 'module2'
