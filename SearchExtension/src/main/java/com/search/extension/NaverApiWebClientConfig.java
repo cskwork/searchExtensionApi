@@ -1,14 +1,14 @@
 package com.search.extension;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+
 
 @Configuration
-public class NaverApiConfig {
+public class NaverApiWebClientConfig {
 
     @Value("${naver.api.base-url}")
     private String naverApiBaseUrl;
@@ -18,16 +18,16 @@ public class NaverApiConfig {
 
     @Value("${naver.api.client-secret}")
     private String naverApiClientSecret;
-
-    @Bean(name = "naverApiRestTemplate")
-    public RestTemplate naverApiRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder
-                .rootUri(naverApiBaseUrl)
+    
+    @Bean(name = "naverApiWebClient")
+    public WebClient naverApiWebClient() {
+        return WebClient.builder()
+                .baseUrl(naverApiBaseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + naverApiClientSecret)
                 .defaultHeader("X-Naver-Client-Id", naverApiClientId)
                 .defaultHeader("X-Naver-Client-Secret", naverApiClientSecret)
                 .build();
-    }
+    }  
 }
 /*
 # TEST RUN

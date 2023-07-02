@@ -75,7 +75,7 @@ API_SEARCH_USER_REQUEST		 (블로그 검색 인입 사용자)
 		### 쿼리 파라미터
 		이름	타입	설명	필수
 		query	String	검색을 원하는 질의어	O
-		sort	String	결과 문서 정렬 방식, accuracy(정확도순) 또는 recency(최신순), 기본 값 accuracy	X
+		sort	String	(accuracy,recency) 결과 문서 정렬 방식, accuracy(정확도순) 또는 recency(최신순), 기본 값 accuracy	X
 		page	Integer	결과 페이지 번호, 1~50 사이의 값, 기본 값 1	X
 		size	Integer	한 페이지에 보여질 문서 수, 1~50 사이의 값, 기본 값 10	X
 		
@@ -83,7 +83,7 @@ API_SEARCH_USER_REQUEST		 (블로그 검색 인입 사용자)
 		### 파라미터
 		파라미터	타입	필수 여부	설명
 		query	String	Y	검색어. UTF-8로 인코딩되어야 합니다.
-		sort	String	N	검색 결과 정렬 방법 (sim: 정확도순으로 내림차순 정렬(기본값), date: 날짜순으로 내림차순 정렬)
+		sort	String	N	(sim,date) 검색 결과 정렬 방법 (sim: 정확도순으로 내림차순 정렬(기본값), date: 날짜순으로 내림차순 정렬)
 		start	Integer	N	검색 시작 위치(기본값: 1, 최댓값: 1000)
 		display	Integer	N	한 번에 표시할 검색 결과 개수(기본값: 10, 최댓값: 100)
 	

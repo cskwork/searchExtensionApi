@@ -1,25 +1,24 @@
 package com.search.extension;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class KakaoApiConfig {
+public class KakaoApiWebClientConfig {
 
     @Value("${kakao.api.base-url}")
     private String kakaoApiBaseUrl;
 
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
-
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder
-                .rootUri(kakaoApiBaseUrl)
+    
+    @Bean(name = "kakaoApiWebClient")
+    public WebClient kakaoApiWebClient() {
+        return WebClient.builder()
+                .baseUrl(kakaoApiBaseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK " + kakaoApiKey)
                 .build();
     }
