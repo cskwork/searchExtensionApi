@@ -39,8 +39,9 @@ public class AppConfig {
 		CircuitBreakerConfig defaultConfig = CircuitBreakerConfig.custom()
 				.failureRateThreshold(50)
 				.waitDurationInOpenState(Duration.ofMillis(1000))
-				.ringBufferSizeInHalfOpenState(2)
-				.ringBufferSizeInClosedState(2).build();
+				//.ringBufferSizeInHalfOpenState(2)
+				//.ringBufferSizeInClosedState(2)
+				.build();
 
 		CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(defaultConfig);
 

@@ -2,11 +2,15 @@ package com.search.extension.apiSearch.application.port;
 
 import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 public interface ApiBlogSearchService {
 	
-	BlogSearchResultDTO search(String query, String sort, int page, int size);
+	// GET
+	BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size);
+	PopularKeywordDTO getPopularKeyword();
 	
+	// POST
 	PopularKeyword addPopularKeyword(String keyword, Integer count, String apiSource);
 	 
 // MOVE TO SEPARATE PACKAGE

@@ -9,24 +9,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
-@RestController // http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
+@RestController
 public class ApiSearchController {
 	
 	  @Autowired
 	  private  ApiBlogSearchService apiSearchService;
-	
-	  // http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
+	  
 	  /**
-	   * 
+	   * http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
 	   * @param query
 	   * @param sort (accuracy = 정확도순 ,recency = 최신순)
 	   * @param page
 	   * @param pageSize
 	   * @return
+	   * 
 	   */
 	  @GetMapping("/search")
-	  public ResponseEntity<BlogSearchResultDTO> search
+	  public ResponseEntity<BlogSearchResultDTO> getApiSearchResults
 	  		(
 	          @RequestParam (value = "query", required = true) 		String query,
 	          @RequestParam (value = "sort", required = false) 		String sort,
@@ -35,8 +36,15 @@ public class ApiSearchController {
 	        ) 
 	  {
 		  
-	    BlogSearchResultDTO result = apiSearchService.search(query, sort, page, pageSize);
+	    BlogSearchResultDTO result = apiSearchService.getApiSearchResults(query, sort, page, pageSize);
 	    return ResponseEntity.ok(result);
+	  }
+	  
+	  @GetMapping("/popularKeyword")
+	  public ResponseEntity<PopularKeywordDTO> getPopularKeyword() 
+	  {	  
+		  PopularKeywordDTO result = apiSearchService.getPopularKeyword();
+		  return ResponseEntity.ok(result);
 	  }
 }
 
