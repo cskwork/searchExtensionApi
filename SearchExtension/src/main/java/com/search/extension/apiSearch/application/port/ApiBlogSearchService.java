@@ -7,7 +7,7 @@ public interface ApiBlogSearchService {
 	BlogSearchResultDTO search(String query, String sort, int page, int size);
 	
 	
-	// MOVE TO SEPARATE PACKAGE
+// MOVE TO SEPARATE PACKAGE
 //	public List<PopularKeywordDTO> getPopularKeywords() {
 //        return keywordSearchFrequencyRepository.findTop10ByOrderByFrequencyDesc();
 //    }
