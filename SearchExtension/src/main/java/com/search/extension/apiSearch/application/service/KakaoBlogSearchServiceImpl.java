@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.search.extension.apiSearch.application.exception.ApiSearchRequestException;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
@@ -27,23 +28,28 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
     private WebClient kakaoApiWebClient;
 
 	@Override
-	public BlogSearchResultDTO search(String query, String sort, int page, int size) {
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder
-				.fromPath(apiEndpoint+"uhih")
-				.queryParam("query", query)
-				.queryParam("sort", sort)
-				.queryParam("page", page)
-				.queryParam("size", size);
-
-		String url = uriBuilder.toUriString();
-		log.debug("URL : " + url);
-
-	    Mono<KakaoBlogSearchResultDTO> responseMono = kakaoApiWebClient.get()
-	            .uri(url)
-	            .retrieve()
-	            .bodyToMono(KakaoBlogSearchResultDTO.class);
-
-	    KakaoBlogSearchResultDTO responseEntity = responseMono.block();
+	public BlogSearchResultDTO search(String query, String sort, int page, int size) {	
+		KakaoBlogSearchResultDTO responseEntity = new KakaoBlogSearchResultDTO();
+		try {
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder
+					.fromPath(apiEndpoint+"uhih")
+					.queryParam("query", query)
+					.queryParam("sort", sort)
+					.queryParam("page", page)
+					.queryParam("size", size);
+	
+			String url = uriBuilder.toUriString();
+			log.debug("URL : " + url);
+			
+		    Mono<KakaoBlogSearchResultDTO> responseMono = kakaoApiWebClient.get()
+		            .uri(url)
+		            .retrieve()
+		            .bodyToMono(KakaoBlogSearchResultDTO.class);
+	
+		    responseEntity = responseMono.block();
+		} catch (Exception e) {
+	        throw new ApiSearchRequestException(e.getMessage());
+	    }
 		return responseEntity;
 	}
 }

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
@@ -42,23 +43,19 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	            .decorateCheckedSupplier(secondCircuitBreaker,
 	                    () -> naverApi.search(query, sort, page, size));
 
-	    // You can remove the try-catch block here
 	    return Try.of(firstApiCall)
 	            .recoverWith(throwable -> Try.of(secondApiCall))
 	            // ADD ADDITIONAL API HERE
 	            // ...
  
 	            .onFailure(e -> {
-	                e.printStackTrace();
 	                log.error("Error message: " + e.getMessage());
-	                // Handle the error or rethrow as necessary
+	                throw new ApiRequestsFailedException(e.getMessage());
 	            })
 	            .getOrElse(() -> {
-	                // Provide a default value or create an error handling mechanism to return an appropriate response
 	                log.error("All API calls failed");
-	                return null; // or return an appropriate default value
+	                throw new ApiRequestsFailedException("ALL API CALLS FAILED");
+	               // return null; // or return an appropriate default value
 	            });
 	}
-
-
 }
