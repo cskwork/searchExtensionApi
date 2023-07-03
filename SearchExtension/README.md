@@ -2,15 +2,21 @@
 ====================================================
 ## 목차
 1 과제 기능 요구사항
+
 2 개발환경
+
 3 DB 모델링
+
 4 API 정리
-	4.1 카카오 API
-	4.2 네이버 API
+- 4.1 카카오 API
+- 4.2 네이버 API
+
 5 참고 자료 
+
 ====================================================
 
-1 과제 기능 요구사항
+## 1 과제 기능 요구사항
+
 	- JAVA 11 이상 또는 Kotlin 사용
 	- Spring Boot 사용
 	- Gradle 기반의 프로젝트
@@ -40,7 +46,7 @@
 
 ====================================================
 
-2 개발 환경 
+## 2 개발 환경 
 
 - Language : **Java 11**
 - FrameWork : **Spring Boot 2.3.6.RELEASE + Spring JPA + Junit 5**
@@ -50,7 +56,7 @@
 
 ====================================================
 
-3 DB 모델링 
+## 3 DB 모델링 
 
 API_SEARCH_POPULAR_KEYWORD 	 (블로그 인기 검색어 목록)
 	KEYWORD_ID		NUMBER 		PK
@@ -70,7 +76,8 @@ API_SEARCH_USER_REQUEST		 (블로그 검색 인입 사용자)
 	
 ====================================================	
 	
-4 API 정리
+## 4 API 정리
+
 	4.1 카카오 API
 		### 쿼리 파라미터
 		이름	타입	설명	필수
@@ -89,7 +96,8 @@ API_SEARCH_USER_REQUEST		 (블로그 검색 인입 사용자)
 	
 ====================================================
 
-5 참고 자료 
+## 5 참고 자료
+
 https://velog.io/@bey1548/spring-boot-configuration-processor
 https://data-make.tistory.com/621
 https://gosunaina.medium.com/cache-redis-ehcache-or-caffeine-45b383ae85ee
