@@ -4,6 +4,6 @@ import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 
 public interface KakaoBlogSearchService {
 	
-	BlogSearchResultDTO search(String query, String sort, int page, int size);
+	BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size);
 	
 }

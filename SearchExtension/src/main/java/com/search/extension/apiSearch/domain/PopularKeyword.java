@@ -12,15 +12,14 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 @Entity
-@Data
 @Table(name = "POPULAR_KEYWORD"
 , uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
+@Data
 public class PopularKeyword {
-	
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Id
+	@Id 
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "KEYWORD_ID")
-	private String keywordId;
+	private Long keywordId;
 
 	@Column(name = "KEYWORD", nullable = false)
 	private String keyword;

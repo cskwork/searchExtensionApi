@@ -2,10 +2,9 @@ package com.search.extension.apiSearch.application.service;
 
 import java.sql.Timestamp;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordRepository;
 import com.search.extension.apiSearch.application.exception.ApiInvalidParameterException;
@@ -14,15 +13,20 @@ import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
 import com.search.extension.apiSearch.domain.PopularKeyword;
+import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
+import lombok.extern.log4j.Log4j2;
 
+@Service
+@Log4j2
 public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
-	private static final Logger log = LogManager.getLogger(ApiBlogSearchServiceImpl.class);
+	
 	@Autowired
 	private PopularKeywordRepository keywordRepository;
 
@@ -48,7 +52,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	};
 
 	@Override
-	public BlogSearchResultDTO search(String query, String sort, int page, int size) {
+	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
 		boolean isValidParameter = isValidParameter(sort, size, page);
 		log.info("isValidParameter : " + isValidParameter);
 
@@ -57,41 +61,53 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 		CheckedFunction0<BlogSearchResultDTO> firstApiCall = CircuitBreaker
 				.decorateCheckedSupplier(firstCircuitBreaker,
 				() -> {
-					log.info("Using Kakao API");
-					BlogSearchResultDTO searchResult = kakaoApi.search(query, sort, page, size);
-					// @TODO INSERT POPULAR KEYWORD
+					log.info("Using "+ApiConstants.KAKAO_NAME+" API");
+					BlogSearchResultDTO searchResult = kakaoApi.getApiSearchResults(query, sort, page, size);
 					if (searchResult != null) {
-
-					}
-					//addPopularKeyword(query, 1, "kakao");
+						addPopularKeyword(query, 1, ApiConstants.KAKAO_NAME);
+					}	
 					return searchResult;
 				});
 
 		CheckedFunction0<BlogSearchResultDTO> secondApiCall = CircuitBreaker
 				.decorateCheckedSupplier(secondCircuitBreaker, () -> {
-					log.info("Using Naver API");
-					BlogSearchResultDTO searchResult = naverApi.search(query, sort, page, size);
-					// @TODO INSERT POPULAR KEYWORD
-					if (!searchResult.equals("null")) {
-
+					log.info("Using "+ApiConstants.NAVER_NAME+" API");
+					BlogSearchResultDTO searchResult = naverApi.getApiSearchResults(query, sort, page, size);
+					if (searchResult != null) {
+						addPopularKeyword(query, 1, ApiConstants.NAVER_NAME);
 					}
-					//addPopularKeyword(query, 1, "naver");
 					return searchResult;
 				});
 
-		return Try.of(firstApiCall).recoverWith(throwable -> Try.of(secondApiCall))
-				// ADD ADDITIONAL API HERE
+		return Try.of(firstApiCall)
+				.recoverWith(throwable -> Try.of(secondApiCall))
+				// API 하단에 추가 
+				// 예) .recoverWith(throwable -> Try.of(thirdApiCall))
 				// ...
 				.onFailure(e -> {
 					log.error("Error message: " + e.getMessage());
-					// throw new ApiRequestsFailedException("API CALL FAIL");
+					throw new ApiRequestsFailedException("API CALL FAIL");
 				}).getOrElse(() -> {
-					// return null;
-					log.error("All API calls failed");
-					throw new ApiRequestsFailedException("ALL API CALLS FAILED");
-					// return null; // or return an appropriate default value
+					String callFailMessage= "ALL API CALLS FAILED";
+					log.error(callFailMessage);
+					throw new ApiRequestsFailedException(callFailMessage);
 				});
 	}
+	
+//	public CheckedFunction0<BlogSearchResultDTO> makeApiCallCircuitBreaker(String query, String sort, String page, String size){
+//		CircuitBreaker firstCircuitBreaker = circuitBreakerRegistry.circuitBreaker("kakaoApi");
+//		CircuitBreaker secondCircuitBreaker = circuitBreakerRegistry.circuitBreaker("naverApi");
+//		CheckedFunction0<BlogSearchResultDTO> firstApiCall = CircuitBreaker
+//			.decorateCheckedSupplier(firstCircuitBreaker,
+//			() -> {
+//				log.info("Using "+ApiConstants.KAKAO_NAME+" API");
+//				BlogSearchResultDTO searchResult = kakaoApi.search(query, sort, page, size);
+//				if (searchResult != null) {
+//					addPopularKeyword(query, 1, ApiConstants.KAKAO_NAME);
+//				}	
+//				return searchResult;
+//			});	
+//	}
 
 	public PopularKeyword addPopularKeyword(String keyword, Integer count, String apiSource) {
 		PopularKeyword popularKeyword = new PopularKeyword();
@@ -104,6 +120,13 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 		popularKeyword.setUpdatedTime(currentTime);
 
 		return keywordRepository.save(popularKeyword);
+	}
+
+	@Override
+	public PopularKeywordDTO getPopularKeyword() {
+		// TODO Auto-generated method stub
+		keywordRepository.findById("1"); // BY DATE?
+		return null;
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.search.extension.apiSearch.application.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,17 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
 
+import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
 @Service
+@Log4j2
 public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
-    private static final Logger log = LogManager.getLogger(KakaoBlogSearchServiceImpl.class);
-    
+	
 	@Value("${kakao.api.blog-search-path}")
 	private String apiEndpoint;
 
@@ -28,9 +26,9 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
     private WebClient kakaoApiWebClient;
 
 	@Override
-	public BlogSearchResultDTO search(String query, String sort, int page, int size) {
+	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder
-				.fromPath(apiEndpoint)
+				.fromPath(apiEndpoint+"fee/few")
 				.queryParam("query", query)
 				.queryParam("sort", sort)
 				.queryParam("page", page)
