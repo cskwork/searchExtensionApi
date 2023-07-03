@@ -28,7 +28,7 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 	@Override
 	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder
-				.fromPath(apiEndpoint+"fee/few")
+				.fromPath(apiEndpoint)
 				.queryParam("query", query)
 				.queryParam("sort", sort)
 				.queryParam("page", page)
