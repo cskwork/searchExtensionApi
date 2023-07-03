@@ -20,8 +20,6 @@ import reactor.core.publisher.Mono;
 public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
     private static final Logger log = LogManager.getLogger(KakaoBlogSearchServiceImpl.class);
     
-    private ApiBlogSearchService apiBlogSearchService;
-
 	@Value("${kakao.api.blog-search-path}")
 	private String apiEndpoint;
 
