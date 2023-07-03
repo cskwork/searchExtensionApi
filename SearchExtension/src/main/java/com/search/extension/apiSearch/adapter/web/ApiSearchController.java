@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 
-@RestController // http://localhost:8080/search?query="과자"
+@RestController // http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
 public class ApiSearchController {
 	
 	  @Autowired
 	  private  ApiBlogSearchService apiSearchService;
 	
-	  // http://localhost:8080/search?query=abc&sort=1&page=1&pageSize=1
+	  // http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
 	  /**
 	   * 
 	   * @param query

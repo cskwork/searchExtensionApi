@@ -32,7 +32,7 @@ public class ApiSearchRequestException extends ErrorResponseException {
 	private static ProblemDetail asProblemDetail(HttpStatus customStatus, String failMessage ) {
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, failMessage);
 		problemDetail.setTitle("Api Request Failed");
-		problemDetail.setType(URI.create("http://localhost:8080/errors/not-found"));
+		// problemDetail.setType(URI.create("http://localhost:8080/errors/request-fail"));
 		problemDetail.setProperty("errorCategory", "Generic");
 		problemDetail.setProperty("timestamp", Instant.now());
 		return problemDetail;
