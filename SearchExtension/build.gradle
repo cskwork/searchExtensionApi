@@ -29,7 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // Spring Boot Data JPA Starter
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // Spring Boot Starter Test
+    // Spring Boot Starter Test - Junit 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // Spring Boot DevTools - Development Only
@@ -63,5 +63,9 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	test {
+	    useJUnitPlatform {
+	    
+	    }
+	}
 }

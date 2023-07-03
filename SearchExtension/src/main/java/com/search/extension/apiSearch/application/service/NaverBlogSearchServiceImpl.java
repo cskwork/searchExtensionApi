@@ -20,8 +20,6 @@ import reactor.core.publisher.Mono;
 public class NaverBlogSearchServiceImpl implements NaverBlogSearchService {
     private static final Logger log = LogManager.getLogger(NaverBlogSearchServiceImpl.class);
 
-    private ApiBlogSearchService apiBlogSearchService;
-
 	@Value("${naver.api.blog-search-path}")
 	private String apiEndpoint;
 	
