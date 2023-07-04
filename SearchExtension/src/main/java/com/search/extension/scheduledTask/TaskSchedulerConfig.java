@@ -15,7 +15,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @EnableScheduling
 @ComponentScan(basePackages = "com.search.extension.scheduledTask"
 			 , basePackageClasses = {
-					 	UpdatePopularKeywordTask.class 
+			 	UpdatePopularKeywordTask.class 
 			 })
 public class TaskSchedulerConfig implements SchedulingConfigurer {
 	@Autowired
@@ -31,8 +31,6 @@ public class TaskSchedulerConfig implements SchedulingConfigurer {
 
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegister) {
-		//TaskScheduler taskScheduler = threadPoolTaskScheduler();
-		//taskRegister.setTaskScheduler(taskScheduler);
 	    Runnable task = () -> updatePopularKeywordsTask.updatePopularKeywordDatabase();
 	    threadPoolTaskScheduler().scheduleAtFixedRate(task,Duration.ofSeconds(5));
 	}
