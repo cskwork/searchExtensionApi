@@ -9,7 +9,7 @@ public class ExceptionHandlerUtil {
 		if (!(sort.equals("accuracy") || sort.equals("recency"))) {
 			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_SORT);
 		}
-		if (size > 999999 || page > 99999) {
+		if ( (size > 50 || size < 1)  || (page > 50 || page < 1) ){
 			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_PAGE);
 		}
 		return true;

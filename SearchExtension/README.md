@@ -75,7 +75,7 @@ SEARCH_KEYWORD_HISTORY		 (블로그 검색 기록)
 	
 ## 4 API 정리
 
-	4.1 카카오 API
+	4.1 카카오 API - https://developers.kakao.com/docs/latest/ko/daum-search/dev-guide#search-blog
 		### 쿼리 파라미터
 		이름	타입	설명	필수
 		query	String	검색을 원하는 질의어	O
@@ -83,7 +83,7 @@ SEARCH_KEYWORD_HISTORY		 (블로그 검색 기록)
 		page	Integer	결과 페이지 번호, 1~50 사이의 값, 기본 값 1	X
 		size	Integer	한 페이지에 보여질 문서 수, 1~50 사이의 값, 기본 값 10	X
 		
-	4.2 네이버 API
+	4.2 네이버 API - https://developers.naver.com/docs/serviceapi/search/blog/blog.md
 		### 파라미터
 		파라미터	타입	필수 여부	설명
 		query	String	Y	검색어. UTF-8로 인코딩되어야 합니다.
