@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
+import com.search.extension.apiSearch.adapter.persistence.SearchKeywordHistoryJpaRepository;
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
@@ -24,7 +24,7 @@ public class ApiBlogSearchServiceImplTest {
 	private ApiBlogSearchServiceImpl service;
 
 	@Mock
-	private PopularKeywordJpaRepository keywordRepository;
+	private SearchKeywordHistoryJpaRepository keywordRepository;
 
 	@Mock
 	@Qualifier("kakaoApi")
