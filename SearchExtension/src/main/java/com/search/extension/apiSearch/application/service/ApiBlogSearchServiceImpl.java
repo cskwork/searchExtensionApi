@@ -1,12 +1,14 @@
 package com.search.extension.apiSearch.application.service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
+import com.search.extension.apiSearch.adapter.persistence.PopularKeywordQueryRepository;
 import com.search.extension.apiSearch.application.exception.ApiInvalidParameterException;
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
@@ -25,9 +27,13 @@ import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
+//@RequiredArgsConstructor
 public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
-
-	private PopularKeywordJpaRepository keywordRepository;
+	
+	@Autowired
+	private PopularKeywordJpaRepository keywordJpaRepository;
+	@Autowired
+	private PopularKeywordQueryRepository keywordQueryRepository;
 	
 	@Autowired
 	@Qualifier("kakaoApi")
@@ -117,14 +123,12 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 		popularKeyword.setCreatedTime(currentTime);
 
-		return keywordRepository.save(popularKeyword);
+		return keywordJpaRepository.save(popularKeyword);
 	}
 
 	@Override
-	public PopularKeywordDTO getPopularKeyword() {
-		// TODO Auto-generated method stub
-		keywordRepository.findAll(); // BY DATE?
-		return null;
+	public List<SearchKeywordHistory> getPopularKeyword() {
+		return keywordQueryRepository.getGroupByApiSourceForKeyword();
 	}
 
 }

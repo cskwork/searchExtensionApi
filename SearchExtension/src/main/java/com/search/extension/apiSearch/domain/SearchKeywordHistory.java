@@ -9,11 +9,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "SEARCH_KEYWORD_HISTORY", uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
 @Data
+@Table(name = "SEARCH_KEYWORD_HISTORY"
+, uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
+@AllArgsConstructor
+@NoArgsConstructor
 public class SearchKeywordHistory {
 	@Id 
 	@GeneratedValue(strategy = GenerationType.AUTO)

@@ -14,25 +14,19 @@ import com.search.extension.apiSearch.application.service.NaverBlogSearchService
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
 public class AppConfig {
-
-	@Bean
-	public ApiBlogSearchService apiSearchService() {
-		return new ApiBlogSearchServiceImpl();
-	}
-
 	@Bean
 	public KakaoBlogSearchService kakaoApi() {
 		return new KakaoBlogSearchServiceImpl();
 	}
-
 	@Bean
 	public NaverBlogSearchService naverApi() {
 		return new NaverBlogSearchServiceImpl();
 	}
-
 	@Bean
 	public CircuitBreakerRegistry circuitBreakerRegistry() {
 		CircuitBreakerConfig defaultConfig = CircuitBreakerConfig.custom()
