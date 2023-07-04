@@ -19,7 +19,6 @@ import lombok.extern.log4j.Log4j2;
 @NoArgsConstructor
 public class UpdatePopularKeywordTask implements Runnable {
 	private String message;
-
 	public UpdatePopularKeywordTask(String message){
         this.message = message;
     }

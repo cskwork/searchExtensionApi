@@ -39,7 +39,7 @@
 	
 	- Back-end 추가 요건
 		*트래픽이 많고, 저장되어 있는 데이터가 많음을 염두에 둔 구현
-		(인덱스, 커넥션풀링(HikariCP), DB 파티션닝, 캐싱, 배치 업데이트, 비동기 처리(정확도 이슈 때문에 제외) , 로드 밸런싱, 성능 테스트)
+		(검토 : 인덱스, 커넥션풀링(HikariCP), DB 파티션닝, 캐싱, 배치 업데이트, 비동기 처리(정확도 이슈 때문에 제외) , 로드 밸런싱, 성능 테스트)
 		*동시성 이슈가 발생할 수 있는 부분을 염두에 둔 구현 (예시. 키워드 별로 검색된 횟수의 정확도)
 		*카카오 블로그 검색 API에 장애가 발생한 경우, 네이버 블로그 검색 API를 통해 데이터 제공
 		*네이버 블로그 검색 API: https://developers.naver.com/docs/serviceapi/search/blog/blog.md
@@ -48,31 +48,28 @@
 
 ## 2 개발 환경 
 
-- Language : **Java 11**
-- FrameWork : **Spring Boot 2.3.6.RELEASE + Spring JPA + Junit 5**
-- Database : **H2 1.4.199.RELEASE** 
+- Language : **Java 17**
+- FrameWork : **Spring Boot 3.1.1.RELEASE + Spring JPA + QueryDsl + Junit 5**
+- Database : **H2 2.1.214.RELEASE** 
 - Connection Pooling : HikariCP
-- Utility : Caffeine cache, TimedTask
+- Utility : ScheduleTask, Resilience4j, Log4j2
 
 ====================================================
 
 ## 3 DB 모델링 
 
-API_SEARCH_POPULAR_KEYWORD 	 (블로그 인기 검색어 목록)
+POPULAR_KEYWORD 	 		 (블로그 인기 검색어 목록)
 	KEYWORD_ID		NUMBER 		PK
 	KEYWORD			VARCHAR		NOT NULL
 	COUNT			NUMBER		DEFAULT 0
-	API_SOURCE		VARCHAR		NULL
 	CREATED_TIME	TIMESTAMP	NOT NULL
-	UPDATED_TIME 	TIMESTAMP	NOT NULL
 	
-API_SEARCH_USER_REQUEST		 (블로그 검색 인입 사용자)
-	USER_ID			VARCHAR 	PK
-	KEYWORD_ID		NUMBER 		FK
-	REQUEST_IP		VARCHAR		NULL
-	REQUEST_COUNT	NUMBER		DEFAULT 0
+SEARCH_KEYWORD_HISTORY		 (블로그 검색 기록)
+	KEYWORD_ID		NUMBER 		PK
+	KEYWORD			VARCHAR		NOT NULL
+	COUNT			NUMBER		DEFAULT 0
+	API_SOURCE		VARCHAR		NOT NULL
 	CREATED_TIME	TIMESTAMP	NOT NULL
-	UPDATED_TIME 	TIMESTAMP	NOT NULL
 	
 ====================================================	
 	
@@ -104,30 +101,3 @@ https://gosunaina.medium.com/cache-redis-ehcache-or-caffeine-45b383ae85ee
 https://chat.openai.com/share/ffcbb912-6af9-41c0-9057-05b977545612
 https://wrtn.ai/share/zf52CubFFq
 https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC#controlleradvice-vs-restcontrolleradvice
-
-### 공통 오류 처리 
-
-Code	Description
-200		정상 응답
-400		잘못된 요청
-404		리소스를 찾을 수 없음
-500		각종 오류 처리
-
-```
-// 정상 응답 예시
-{
-"code": "200",
-"message": "정상 처리",
-"body": {
-"rcvAmt": 10000
-   }
-}
-
-// 오류 응답 예시
-{
-"errorStatus": "INTERNAL_SERVER_ERROR",
-"errorCode": 500,
-"errorMessage": "뿌린 사용자만 조회가 가능합니다."
-}
-```
-
