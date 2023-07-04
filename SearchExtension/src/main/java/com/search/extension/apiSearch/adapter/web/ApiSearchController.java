@@ -1,6 +1,8 @@
 package com.search.extension.apiSearch.adapter.web;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
+import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
@@ -40,10 +43,14 @@ public class ApiSearchController {
 	    return ResponseEntity.ok(result);
 	  }
 	  
+	  /**
+	   * http://localhost:8080/popularKeyword
+	   * @return
+	   */
 	  @GetMapping("/popularKeyword")
-	  public ResponseEntity<PopularKeywordDTO> getPopularKeyword() 
+	  public ResponseEntity<List<SearchKeywordHistory>> getPopularKeyword() 
 	  {	  
-		  PopularKeywordDTO result = apiSearchService.getPopularKeyword();
+		  List<SearchKeywordHistory> result = apiSearchService.getPopularKeyword();
 		  return ResponseEntity.ok(result);
 	  }
 }

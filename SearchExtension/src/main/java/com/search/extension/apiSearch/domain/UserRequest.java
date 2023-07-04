@@ -10,11 +10,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "USER_REQUEST"
 , uniqueConstraints = { @UniqueConstraint(name = "USER_ID", columnNames = { "USER_ID" }) })
 @Data
+@NoArgsConstructor
 public class UserRequest {
 	@Id
 	@Column(name = "USER_ID")
