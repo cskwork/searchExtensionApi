@@ -17,9 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "SEARCH_KEYWORD_HISTORY"
 , uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
-@AllArgsConstructor
-@NoArgsConstructor
-public class SearchKeywordHistory {
+public class SearchKeywordHistory { 
 	@Id 
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "KEYWORD_ID")
@@ -35,5 +33,5 @@ public class SearchKeywordHistory {
 	private String apiSource;
 
 	@Column(name = "CREATED_TIME", nullable = false)
-	private Timestamp createdTime;
+	private Timestamp createdTime;	
 }

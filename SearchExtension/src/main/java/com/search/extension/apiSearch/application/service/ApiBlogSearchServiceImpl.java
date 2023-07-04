@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordQueryRepository;
-import com.search.extension.apiSearch.application.exception.ApiInvalidParameterException;
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
@@ -17,6 +16,7 @@ import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
 import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.ErrorResponse;
 import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -45,16 +45,6 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 
 	@Autowired
 	private CircuitBreakerRegistry circuitBreakerRegistry;
-
-	public static boolean isValidParameter(String sort, int size, int page) {
-		if (!(sort.equals("accuracy") || sort.equals("recency"))) {
-			throw new ApiInvalidParameterException("Sort Paramter Invalid");
-		}
-		if (size > 999999 || page > 99999) {
-			throw new ApiInvalidParameterException("SIZE OUT OF BOUNDS");
-		}
-		return true;
-	};
 
 	@Override
 	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
@@ -91,29 +81,13 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 				// ...
 				.onFailure(e -> {
 					log.error("Error message: " + e.getMessage());
-					throw new ApiRequestsFailedException("API CALL FAIL");
+					throw new ApiRequestsFailedException(ErrorResponse.API_CALL_FAIL);
 				}).getOrElse(() -> {
-					String callFailMessage= "ALL API CALLS FAILED";
-					log.error(callFailMessage);
-					throw new ApiRequestsFailedException(callFailMessage);
+					log.error("VALUE NOT PRESENT");
+					throw new ApiRequestsFailedException(ErrorResponse.INTERNAL_SERVER_ERROR);
 				});
 	}
 	
-//	public CheckedFunction0<BlogSearchResultDTO> makeApiCallCircuitBreaker(String query, String sort, String page, String size){
-//		CircuitBreaker firstCircuitBreaker = circuitBreakerRegistry.circuitBreaker("kakaoApi");
-//		CircuitBreaker secondCircuitBreaker = circuitBreakerRegistry.circuitBreaker("naverApi");
-//		CheckedFunction0<BlogSearchResultDTO> firstApiCall = CircuitBreaker
-//			.decorateCheckedSupplier(firstCircuitBreaker,
-//			() -> {
-//				log.info("Using "+ApiConstants.KAKAO_NAME+" API");
-//				BlogSearchResultDTO searchResult = kakaoApi.search(query, sort, page, size);
-//				if (searchResult != null) {
-//					addPopularKeyword(query, 1, ApiConstants.KAKAO_NAME);
-//				}	
-//				return searchResult;
-//			});	
-//	}
-
 	public SearchKeywordHistory addPopularKeyword(String keyword, Integer count, String apiSource) {
 		SearchKeywordHistory popularKeyword = new SearchKeywordHistory();
 		popularKeyword.setKeyword(keyword);
@@ -127,8 +101,18 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	}
 
 	@Override
-	public List<SearchKeywordHistory> getPopularKeyword() {
+	public List<PopularKeywordDTO> getPopularKeyword() {
 		return keywordQueryRepository.getGroupByApiSourceForKeyword();
 	}
+	
+	public static boolean isValidParameter(String sort, int size, int page) {
+		if (!(sort.equals("accuracy") || sort.equals("recency"))) {
+			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_SORT);
+		}
+		if (size > 999999 || page > 99999) {
+			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_PAGE);
+		}
+		return true;
+	};
 
 }

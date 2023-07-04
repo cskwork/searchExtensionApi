@@ -73,18 +73,17 @@ tasks.named('test') {
 }
 
 // ======QUERYDSL ECLIPSE
-// Additional Querydsl configuration
-def generated = 'src/main/generated'
-// Querydsl - Place QClass files to the specific directory
+def generated = 'src/main/generated' 
+
 tasks.withType(JavaCompile) {
-    options.getGeneratedSourceOutputDirectory().set(file(generated))
+    options.getGeneratedSourceOutputDirectory().set(file(generated)) // Querydsl - Place QClass files to the specific directory
 }
-// Querydsl - Add QClass file path to the java source set
+
 sourceSets {
-    main.java.srcDirs += [ generated ]
+    main.java.srcDirs += [ generated ] // Querydsl - Add QClass file path to the java source set
 }
-// Querydsl - Remove QClass directory when doing `gradle clean`
+
 clean {
-    delete file(generated)
+    delete file(generated) // Querydsl - Remove QClass directory when doing `gradle clean`
 }
 // ======QUERYDSL ECLIPSE
