@@ -52,13 +52,5 @@ public class ApiSearchControllerTest {
 		
 	    // 요청 정상 확인 200
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		
-	    // JSON -> DTO
-	   // ObjectMapper objectMapper = new ObjectMapper();
-	   // KakaoBlogSearchResultDTO responseDto = objectMapper.readValue(response.getContentAsString(), KakaoBlogSearchResultDTO.class);
-	    // 요청 정상 확인
-	    // assertinInstanceOf(object, response);
-	    
-
 	}
 }

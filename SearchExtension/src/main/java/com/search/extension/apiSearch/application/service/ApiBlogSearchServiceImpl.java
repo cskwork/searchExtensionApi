@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordQueryRepository;
+import com.search.extension.apiSearch.adapter.persistence.SearchKeywordHistoryJpaRepository;
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
+import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.ErrorResponse;
-import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -31,7 +31,7 @@ import lombok.extern.log4j.Log4j2;
 public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	
 	@Autowired
-	private PopularKeywordJpaRepository keywordJpaRepository;
+	private SearchKeywordHistoryJpaRepository keywordJpaRepository;
 	@Autowired
 	private PopularKeywordQueryRepository keywordQueryRepository;
 	
@@ -101,7 +101,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	}
 
 	@Override
-	public List<PopularKeywordDTO> getPopularKeyword() {
+	public List<PopularKeyword> getPopularKeyword() {
 		return keywordQueryRepository.getGroupByApiSourceForKeyword();
 	}
 	

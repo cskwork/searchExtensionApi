@@ -7,31 +7,30 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.search.extension.apiSearch.domain.PopularKeyword;
-import com.search.extension.apiSearch.domain.QPopularKeyword;
+import com.search.extension.apiSearch.domain.QSearchKeywordHistory;
 
 import lombok.AllArgsConstructor;
 
 @Repository
 @AllArgsConstructor
-public class PopularKeywordQueryRepository{
+public class SearchKeywordHistoryQueryRepository{
 	private final JPAQueryFactory queryFactory;
 	
 	/**
-	 * 인기 키워드 리스트 조회 
+	 * 검색 히스토리 그룹 조회 
 	 * @return
 	 */
 	public List<PopularKeyword> getGroupByApiSourceForKeyword() {
-		QPopularKeyword popularKeywordList = QPopularKeyword.popularKeyword;
+		QSearchKeywordHistory searchKeywordHistory = QSearchKeywordHistory.searchKeywordHistory;
 		
 		return queryFactory
 	        .select(Projections.constructor(
 	        		PopularKeyword.class, 
-	                popularKeywordList.keyword 
-	                ,popularKeywordList.count.sum()
-	        		,popularKeywordList.createdTime)) 
-	        .from(popularKeywordList)
-	        .groupBy(popularKeywordList.keyword)
-	        .orderBy(popularKeywordList.count.sum().desc())
+	                searchKeywordHistory.keyword, 
+	                searchKeywordHistory.count.sum())) 
+	        .from(searchKeywordHistory)
+	        .groupBy(searchKeywordHistory.keyword)
+	        .orderBy(searchKeywordHistory.count.sum().desc())
 	        .limit(10)
 	        .fetch();
 	}
