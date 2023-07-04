@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.search.extension.apiSearch.adapter.persistence.PopularKeywordRepository;
+import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
 import com.search.extension.apiSearch.application.exception.ApiInvalidParameterException;
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
-import com.search.extension.apiSearch.domain.PopularKeyword;
+import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
@@ -26,10 +26,9 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
-	
-	@Autowired
-	private PopularKeywordRepository keywordRepository;
 
+	private PopularKeywordJpaRepository keywordRepository;
+	
 	@Autowired
 	@Qualifier("kakaoApi")
 	private KakaoBlogSearchService kakaoApi;
@@ -109,15 +108,14 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 //			});	
 //	}
 
-	public PopularKeyword addPopularKeyword(String keyword, Integer count, String apiSource) {
-		PopularKeyword popularKeyword = new PopularKeyword();
+	public SearchKeywordHistory addPopularKeyword(String keyword, Integer count, String apiSource) {
+		SearchKeywordHistory popularKeyword = new SearchKeywordHistory();
 		popularKeyword.setKeyword(keyword);
 		popularKeyword.setCount(count);
 		popularKeyword.setApiSource(apiSource);
 
 		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 		popularKeyword.setCreatedTime(currentTime);
-		popularKeyword.setUpdatedTime(currentTime);
 
 		return keywordRepository.save(popularKeyword);
 	}
@@ -125,7 +123,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	@Override
 	public PopularKeywordDTO getPopularKeyword() {
 		// TODO Auto-generated method stub
-		keywordRepository.findById("1"); // BY DATE?
+		keywordRepository.findAll(); // BY DATE?
 		return null;
 	}
 

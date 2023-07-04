@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.extension.apiSearch.adapter.web.ApiSearchController;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
@@ -29,17 +30,18 @@ public class ApiSearchControllerTest {
 	private ApiBlogSearchService apiSearchService;
 
 	@Test
-	void searchTest() throws Exception {
-		String query = "abc";
+	void searchKakaoTest() throws Exception {
+		String query = "---------------------------InvalidRequest";
 		String sort = "accuracy";
 		int page = 1;
 		int pageSize = 1;
 		
 		BlogSearchResultDTO expectedResult = new KakaoBlogSearchResultDTO();
-		// Initialize expectedResult with expected values...
 
-		when(apiSearchService.search(query, sort, page, pageSize)).thenReturn(expectedResult);
-
+		when(apiSearchService.getApiSearchResults(query, sort, page, pageSize))
+			.thenReturn(expectedResult);
+		
+        // HTTP GET 요청
 		MockHttpServletResponse response = mockMvc
 				.perform(get("/search")
 				.param("query", query)
@@ -47,8 +49,16 @@ public class ApiSearchControllerTest {
 				.param("page", String.valueOf(page))
 				.param("pageSize", String.valueOf(pageSize)))
 				.andReturn().getResponse();
-
+		
+	    // 요청 정상 확인 200
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		// assertEquals(expectedResult, response.getContentAsString());
+		
+	    // JSON -> DTO
+	   // ObjectMapper objectMapper = new ObjectMapper();
+	   // KakaoBlogSearchResultDTO responseDto = objectMapper.readValue(response.getContentAsString(), KakaoBlogSearchResultDTO.class);
+	    // 요청 정상 확인
+	    // assertinInstanceOf(object, response);
+	    
+
 	}
 }

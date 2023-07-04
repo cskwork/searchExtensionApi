@@ -1,6 +1,5 @@
 package com.search.extension.apiSearch.application.exception;
 
-import java.net.URI;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
