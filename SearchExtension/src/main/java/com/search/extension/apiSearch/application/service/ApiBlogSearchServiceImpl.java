@@ -13,6 +13,7 @@ import com.search.extension.apiSearch.application.exception.ApiRequestsFailedExc
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
+import com.search.extension.apiSearch.application.utils.ExceptionHandlerUtil;
 import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
@@ -48,7 +49,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 
 	@Override
 	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
-		boolean isValidParameter = isValidParameter(sort, size, page);
+		boolean isValidParameter = ExceptionHandlerUtil.isValidParameter(sort, size, page);
 		log.info("isValidParameter : " + isValidParameter);
 
 		CircuitBreaker firstCircuitBreaker = circuitBreakerRegistry.circuitBreaker("kakaoApi");
@@ -104,15 +105,4 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	public List<PopularKeyword> getPopularKeyword() {
 		return keywordQueryRepository.getGroupByApiSourceForKeyword();
 	}
-	
-	public static boolean isValidParameter(String sort, int size, int page) {
-		if (!(sort.equals("accuracy") || sort.equals("recency"))) {
-			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_SORT);
-		}
-		if (size > 999999 || page > 99999) {
-			throw new ApiRequestsFailedException(ErrorResponse.INVALID_PARAMETER_PAGE);
-		}
-		return true;
-	};
-
 }
