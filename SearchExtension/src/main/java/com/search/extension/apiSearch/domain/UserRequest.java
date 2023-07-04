@@ -22,7 +22,7 @@ public class UserRequest {
 
 	@ManyToOne
 	@JoinColumn(name = "KEYWORD_ID", nullable = false)
-	private PopularKeyword popularKeyword;
+	private SearchKeywordHistory popularKeyword;
 
 	@Column(name = "REQUEST_IP")
 	private String requestIp;

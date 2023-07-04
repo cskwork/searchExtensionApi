@@ -1,4 +1,4 @@
-package com.search.extension.apiSearch.domain;
+package com.search.extension;
 
 import java.sql.Timestamp;
 
@@ -12,10 +12,9 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 @Entity
-@Table(name = "POPULAR_KEYWORD"
-, uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
+@Table(name = "SEARCH_KEYWORD_HISTORY", uniqueConstraints = { @UniqueConstraint(name = "KEYWORD_ID", columnNames = { "KEYWORD_ID" }) })
 @Data
-public class PopularKeyword {
+public class SearchKeywordHistory {
 	@Id 
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "KEYWORD_ID")
@@ -32,8 +31,4 @@ public class PopularKeyword {
 
 	@Column(name = "CREATED_TIME", nullable = false)
 	private Timestamp createdTime;
-
-	@Column(name = "UPDATED_TIME", nullable = false)
-	private Timestamp updatedTime;
-
 }
