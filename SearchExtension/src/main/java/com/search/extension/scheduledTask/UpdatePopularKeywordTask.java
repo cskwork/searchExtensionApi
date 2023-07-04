@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
 import com.search.extension.apiSearch.adapter.persistence.SearchKeywordHistoryQueryRepository;
 import com.search.extension.apiSearch.domain.PopularKeyword;
-import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
