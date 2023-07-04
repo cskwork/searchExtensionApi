@@ -32,10 +32,10 @@ public class ApiSearchController {
 	  @GetMapping("/search")
 	  public ResponseEntity<ResponseDTO<BlogSearchResultDTO>> getApiSearchResults
 	  		(
-	          @RequestParam (value = "query", required = true) 		String query,
-	          @RequestParam (value = "sort", required = false) 		String sort,
+	          @RequestParam (value = "query", required = true) 						 	String query,
+	          @RequestParam (value = "sort", required = false) 							String sort,
 	          @RequestParam (value = "page", defaultValue = "1", required = false) 		int page,
-	          @RequestParam (value = "pageSize", defaultValue = "10", required = false)  int pageSize
+	          @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize
 	        ) 
 	  {  
 		BlogSearchResultDTO result = apiSearchService.getApiSearchResults(query, sort, page, pageSize);

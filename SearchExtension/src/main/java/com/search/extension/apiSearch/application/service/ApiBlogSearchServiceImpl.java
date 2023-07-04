@@ -49,6 +49,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 
 	@Override
 	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
+		// 페이징 기본값은 카카오 페이징 방식 기준 (page: 1~50 사이의 값, 기본 값 1, size: 한 페이지에 보여질 문서 수, 1~50 사이의 값 기본 값 10
 		boolean isValidParameter = ExceptionHandlerUtil.isValidParameter(sort, size, page);
 		log.info("isValidParameter : " + isValidParameter);
 

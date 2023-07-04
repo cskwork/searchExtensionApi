@@ -3,6 +3,8 @@ package com.search.extension.apiSearch.application.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,14 +38,16 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 
 		String url = uriBuilder.toUriString();
 		log.info("URL : " + url);
-
+		
 	    Mono<KakaoBlogSearchResultDTO> responseMono = kakaoApiWebClient.get()
 	            .uri(url)
 	            .retrieve()
 	            .bodyToMono(KakaoBlogSearchResultDTO.class);
-
+	    
 	    KakaoBlogSearchResultDTO responseEntity = responseMono.block();
 	    log.info("KAKAO SEARCH SUCCESS");
 		return responseEntity;
 	}
+	
+
 }
