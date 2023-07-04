@@ -22,7 +22,7 @@ public class SearchKeywordHistoryQueryRepository{
 	 */
 	public List<PopularKeyword> getGroupByApiSourceForKeyword() {
 		QSearchKeywordHistory searchKeywordHistory = QSearchKeywordHistory.searchKeywordHistory;
-		
+        
 		return queryFactory
 	        .select(Projections.constructor(
 	        		PopularKeyword.class, 

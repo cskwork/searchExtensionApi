@@ -15,6 +15,7 @@ import com.search.extension.apiSearch.application.exception.ApiRequestsFailedExc
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
 import com.search.extension.apiSearch.application.service.ApiBlogSearchServiceImpl;
+import com.search.extension.apiSearch.application.utils.ExceptionHandlerUtil;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 
@@ -45,14 +46,14 @@ public class ApiBlogSearchServiceImplTest {
 	@Test
 	void testIsValidParameter() {
 		assertThrows(ApiRequestsFailedException.class,
-				() -> ApiBlogSearchServiceImpl.isValidParameter("invalid_sort", 10, 2));
+				() -> ExceptionHandlerUtil.isValidParameter("invalid_sort", 10, 2));
 
 		assertThrows(ApiRequestsFailedException.class,
-				() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 1000000, 2));
+				() -> ExceptionHandlerUtil.isValidParameter("accuracy", 1000000, 2));
 
 		assertThrows(ApiRequestsFailedException.class,
-				() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 10, 100000));
+				() -> ExceptionHandlerUtil.isValidParameter("accuracy", 10, 100000));
 
-		assertDoesNotThrow(() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 1, 5));
+		assertDoesNotThrow(() -> ExceptionHandlerUtil.isValidParameter("accuracy", 1, 5));
 	}
 }
