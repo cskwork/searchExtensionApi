@@ -1,31 +1,41 @@
 package com.search.extension.apiSearch.application.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 
+import com.search.extension.apiSearch.domain.model.ErrorResponseDTO;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
+	
+    @ExceptionHandler({ ApiRequestsFailedException.class })
+    protected ResponseEntity<ErrorResponseDTO> handleApiRequestFailed(ApiRequestsFailedException ex) {
+    	   return new ResponseEntity<>(new ErrorResponseDTO
+    			   (
+	    			   ex.getErrorResponse().getStatus()
+	    			   , ex.getErrorResponse().getMessage()
+    			   )
+    			   , HttpStatus.valueOf(ex.getErrorResponse().getStatus()));
+    }
+    
+    @ExceptionHandler({ Exception.class })
+    protected ResponseEntity<ErrorResponseDTO> handleServerException(Exception ex) {
+    	   return new ResponseEntity<>(new ErrorResponseDTO
+    			   (
+	    			   500
+	    			   , ex.getMessage()
+    			   )
+    			   , HttpStatus.valueOf(500));
+    }
+    
+    /*
+     * MissingServletRequestParameterException.class: request parameter가 없을 때 에러를 리턴한다.
+MissingRequestHeaderException.class: request header가 없을 때 에러를 리턴한다.
+MethodArgumentNotValidException.class: request body의 데이터가 유효하지 않을 때 에러를 리턴한다.
+NoHandlerFoundException.class: 404 error를 리턴한다.
+     */
+    
 }
-/*
-public class ProblemDetail {
-	private static final URI BLANK_TYPE = URI.create("about:blank");
-	// 문제 유형을 식별하는 URI 참조, 정의하지 않으면 기본 값은 "about:blank"
-	private URI type = BLANK_TYPE;
-	// 문제 유형에 대한 사람이 읽을 수 있는 간단한 요약
-	@Nullable
-	private String title;
-	// 이 문제의 응답 Http status 코드
-	private int status;
-	// 문제 유형에 대한 사람이 읽을 수 있는 간단한 설명
-	@Nullable
-	private String detail;
-	// 문제가 발생한 URI
-	@Nullable
-	private URI instance;
-	// 위에 선언한 문서 세부 정보 필드 이외에 추가적으로 사용할 확장 필드를 저장하는 곳
-	@Nullable
-	private Map<String, Object> properties;
-}
-*/
-// https://www.sivalabs.in/spring-boot-3-error-reporting-using-problem-details/

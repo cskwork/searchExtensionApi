@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepository;
-import com.search.extension.apiSearch.application.exception.ApiInvalidParameterException;
+import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
 import com.search.extension.apiSearch.application.service.ApiBlogSearchServiceImpl;
@@ -44,13 +44,13 @@ public class ApiBlogSearchServiceImplTest {
 
 	@Test
 	void testIsValidParameter() {
-		assertThrows(ApiInvalidParameterException.class,
+		assertThrows(ApiRequestsFailedException.class,
 				() -> ApiBlogSearchServiceImpl.isValidParameter("invalid_sort", 10, 2));
 
-		assertThrows(ApiInvalidParameterException.class,
+		assertThrows(ApiRequestsFailedException.class,
 				() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 1000000, 2));
 
-		assertThrows(ApiInvalidParameterException.class,
+		assertThrows(ApiRequestsFailedException.class,
 				() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 10, 100000));
 
 		assertDoesNotThrow(() -> ApiBlogSearchServiceImpl.isValidParameter("accuracy", 1, 5));

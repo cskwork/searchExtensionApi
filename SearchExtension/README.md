@@ -103,6 +103,7 @@ https://data-make.tistory.com/621
 https://gosunaina.medium.com/cache-redis-ehcache-or-caffeine-45b383ae85ee
 https://chat.openai.com/share/ffcbb912-6af9-41c0-9057-05b977545612
 https://wrtn.ai/share/zf52CubFFq
+https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC#controlleradvice-vs-restcontrolleradvice
 
 ### 공통 오류 처리 
 

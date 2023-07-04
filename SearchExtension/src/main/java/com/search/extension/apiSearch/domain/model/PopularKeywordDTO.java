@@ -4,6 +4,12 @@ import lombok.Data;
 
 @Data
 public class PopularKeywordDTO {
-    private String keyword;
-    private int frequency;
+    public PopularKeywordDTO(String keyword, int count) {
+		super();
+		this.keyword = keyword;
+		this.count = count;
+	}
+	private String keyword;
+    private int count;
+    
 }
