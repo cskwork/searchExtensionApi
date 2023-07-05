@@ -1,9 +1,14 @@
 package com.search.extension.apiSearch.adapter.web;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +38,7 @@ public class ApiSearchController {
 	   * @return
 	   */
 	  @GetMapping("/search")
-	  public ResponseEntity<ResponseDTO<BlogSearchResultDTO>> getApiSearchResults
+	  public ResponseEntity<?> getApiSearchResults
 	  		(
 	          @RequestParam (value = "query", required = false) 					String query,
 	          @RequestParam (value = "sort",     defaultValue = "accuracy", required = false) 	String sort,
@@ -44,8 +49,9 @@ public class ApiSearchController {
 		if (StringUtils.isBlank(query)) {
 			throw new ApiRequestsFailedException(ErrorResponse.INVALID_NULL_PARAMETER);
 	    }
-		BlogSearchResultDTO result = apiSearchService.getApiSearchResults(query, sort, page, pageSize);
-		ResponseDTO<BlogSearchResultDTO> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, result);
+		Pageable pageable = PageRequest.of(page, pageSize);
+		Map<String, Object> results = apiSearchService.getApiSearchResults(query, sort, pageable);
+		ResponseDTO<Map<String, Object>> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, results);
 		return ResponseEntity.ok(response);
 	  }
 	  

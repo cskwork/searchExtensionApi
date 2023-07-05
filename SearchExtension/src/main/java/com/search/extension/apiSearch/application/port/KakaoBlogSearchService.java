@@ -1,9 +1,11 @@
 package com.search.extension.apiSearch.application.port;
 
-import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import java.util.Map;
+
+import org.springframework.data.domain.Pageable;
 
 public interface KakaoBlogSearchService {
 	
-	BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size);
+	Map<String, Object> getApiSearchResults(String query, String sort, Pageable pageable);
 	
 }
