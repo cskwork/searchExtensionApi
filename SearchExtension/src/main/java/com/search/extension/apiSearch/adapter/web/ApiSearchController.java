@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
-import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.ErrorResponse;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 import com.search.extension.apiSearch.domain.model.ResponseDTO;
+
+import io.micrometer.common.util.StringUtils;
 
 @RestController
 public class ApiSearchController {
@@ -27,17 +31,19 @@ public class ApiSearchController {
 	   * @param page
 	   * @param pageSize
 	   * @return
-	   * 
 	   */
 	  @GetMapping("/search")
 	  public ResponseEntity<ResponseDTO<BlogSearchResultDTO>> getApiSearchResults
 	  		(
-	          @RequestParam (value = "query", required = true) 						 	String query,
-	          @RequestParam (value = "sort", required = false) 							String sort,
-	          @RequestParam (value = "page", defaultValue = "1", required = false) 		int page,
+	          @RequestParam (value = "query", required = false) 						 	String query,
+	          @RequestParam (value = "sort", 	 defaultValue = "accuracy", required = false) 							String sort,
+	          @RequestParam (value = "page", 	 defaultValue = "1", required = false) 		int page,
 	          @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize
 	        ) 
 	  {  
+		if (StringUtils.isBlank(query)) {
+			throw new ApiRequestsFailedException(ErrorResponse.INVALID_NULL_PARAMETER);
+	    }
 		BlogSearchResultDTO result = apiSearchService.getApiSearchResults(query, sort, page, pageSize);
 		ResponseDTO<BlogSearchResultDTO> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, result);
 		return ResponseEntity.ok(response);
@@ -49,10 +55,10 @@ public class ApiSearchController {
 	   * @return
 	   */
 	  @GetMapping("/popularKeyword")
-	  public  ResponseEntity<ResponseDTO<List<PopularKeyword>>> getPopularKeyword() 
+	  public  ResponseEntity<ResponseDTO<List<PopularKeywordDTO>>> getPopularKeyword() 
 	  {	  
-	    List<PopularKeyword> result = apiSearchService.getPopularKeyword();
-		ResponseDTO<List<PopularKeyword>> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, result);
+	    List<PopularKeywordDTO> result = apiSearchService.getPopularKeyword();
+		ResponseDTO<List<PopularKeywordDTO>> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, result);
 		return ResponseEntity.ok(response);    
 	  }
 }

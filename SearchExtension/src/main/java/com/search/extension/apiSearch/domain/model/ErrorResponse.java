@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum  ErrorResponse {
     //400-499 클라이언트 요청 이슈
-    INVALID_PARAMETER(400, "파라미터 값을 확인해주세요."),
+    INVALID_NULL_PARAMETER(400, "필수 파라미터가 없습니다. 확인해주세요."),
     INVALID_PARAMETER_SORT(401, "순서 정렬 파라미터 값을 확인해주세요. (accuracy, recency)"),
     INVALID_PARAMETER_PAGE(402, "페이징 또는 페이지 범위 파라미터 값을 확인해주세요. (1-50)"),
 

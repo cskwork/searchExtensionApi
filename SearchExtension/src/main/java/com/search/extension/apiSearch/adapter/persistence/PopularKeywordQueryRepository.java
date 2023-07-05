@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.QPopularKeyword;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import lombok.AllArgsConstructor;
 
@@ -20,15 +20,15 @@ public class PopularKeywordQueryRepository{
 	 * 인기 키워드 리스트 조회 
 	 * @return
 	 */
-	public List<PopularKeyword> getGroupByApiSourceForKeyword() {
+	public List<PopularKeywordDTO> getGroupByApiSourceForKeyword() {
 		QPopularKeyword popularKeywordList = QPopularKeyword.popularKeyword;
 		
 		return queryFactory
 	        .select(Projections.constructor(
-	        		PopularKeyword.class, 
+	        		PopularKeywordDTO.class, 
 	                popularKeywordList.keyword 
 	                ,popularKeywordList.count.sum()
-	        		,popularKeywordList.createdTime)) 
+	        		)) 
 	        .from(popularKeywordList)
 	        .groupBy(popularKeywordList.keyword)
 	        .orderBy(popularKeywordList.count.sum().desc())
