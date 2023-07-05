@@ -46,12 +46,12 @@ public class ApiSearchControllerTest {
 		int page = 1;
 		int pageSize = 1;
 		
+		// Stub
 		BlogSearchResultDTO expectedResult = new KakaoBlogSearchResultDTO();
-
 		when(apiSearchService.getApiSearchResults(query, sort, page, pageSize))
 			.thenReturn(expectedResult);
 		
-        // HTTP GET 요청
+        // HTTP GET 요청 Mock
 		MockHttpServletResponse response = mockMvc
 				.perform(get("/search")
 				.param("query", query)
@@ -60,26 +60,24 @@ public class ApiSearchControllerTest {
 				.param("pageSize", String.valueOf(pageSize)))
 				.andReturn().getResponse();
 		
-	    // 요청 정상 확인 200
+		// 응답 확인 200
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
 	}
 	
     @Test
     void testGetPopularKeyword() throws Exception {
-        // Arrange
+        // Stub 
         List<PopularKeywordDTO> expectedKeywords = Collections.singletonList(new PopularKeywordDTO("keyword", 10));
-
-        // Act
         when(apiSearchService.getPopularKeyword())
         	.thenReturn(expectedKeywords);
 
-        // HTTP GET 요청
+        // HTTP GET 요청 Mock
 		MockHttpServletResponse response = mockMvc
 				.perform(get("/popularKeyword"))
 				.andReturn().getResponse();
 
-        // Assert
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+		// 응답 확인 200
+		assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 	
 }
