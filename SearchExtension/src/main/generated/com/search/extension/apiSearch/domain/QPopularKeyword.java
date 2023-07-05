@@ -19,13 +19,13 @@ public class QPopularKeyword extends EntityPathBase<PopularKeyword> {
 
     public static final QPopularKeyword popularKeyword = new QPopularKeyword("popularKeyword");
 
-    public final StringPath apiSource = createString("apiSource");
-
     public final NumberPath<Integer> count = createNumber("count", Integer.class);
 
     public final DateTimePath<java.sql.Timestamp> createdTime = createDateTime("createdTime", java.sql.Timestamp.class);
 
     public final StringPath keyword = createString("keyword");
+
+    public final NumberPath<Long> keywordId = createNumber("keywordId", Long.class);
 
     public QPopularKeyword(String variable) {
         super(PopularKeyword.class, forVariable(variable));

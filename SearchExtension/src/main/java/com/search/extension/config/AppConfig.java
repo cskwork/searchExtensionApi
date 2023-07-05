@@ -1,4 +1,4 @@
-package com.search.extension;
+package com.search.extension.config;
 
 import java.io.IOException;
 import java.time.Duration;

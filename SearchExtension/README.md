@@ -1,4 +1,13 @@
 # 블로그 검색 서비스
+
+1) 지원자 정보 : 2126-000513_채성국_서버 개발자
+2) 프로젝트 설명 하단
+3) Download link 
+
+4) java -jar 실행 JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17
+5) 실행 URL
+	- http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=10
+	- http://localhost:8080/popularKeyword
 ====================================================
 ## 목차
 1 과제 기능 요구사항

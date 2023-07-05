@@ -14,11 +14,11 @@ import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
 import com.search.extension.apiSearch.application.port.NaverBlogSearchService;
 import com.search.extension.apiSearch.application.utils.ExceptionHandlerUtil;
-import com.search.extension.apiSearch.domain.PopularKeyword;
 import com.search.extension.apiSearch.domain.SearchKeywordHistory;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.ErrorResponse;
+import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -34,7 +34,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	@Autowired
 	private SearchKeywordHistoryJpaRepository keywordJpaRepository;
 	@Autowired
-	private PopularKeywordQueryRepository keywordQueryRepository;
+	private PopularKeywordQueryRepository popularKeywordQueryRepository;
 	
 	@Autowired
 	@Qualifier("kakaoApi")
@@ -103,7 +103,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 	}
 
 	@Override
-	public List<PopularKeyword> getPopularKeyword() {
-		return keywordQueryRepository.getGroupByApiSourceForKeyword();
+	public List<PopularKeywordDTO> getPopularKeyword() {
+		return popularKeywordQueryRepository.getGroupByApiSourceForKeyword();
 	}
 }
