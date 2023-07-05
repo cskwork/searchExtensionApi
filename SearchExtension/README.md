@@ -66,10 +66,15 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
 ## 2 개발 환경 
 
 - Language : **Java 17**
-- FrameWork : **Spring Boot 3.1.1.RELEASE + Spring JPA + QueryDsl + Junit 5**
+- FrameWork : **Spring Boot 3.1.1.RELEASE + Spring JPA**
 - Database : **H2 2.1.214.RELEASE** 
-- Connection Pooling : HikariCP
-- Utility : ScheduleTask, Resilience4j, Log4j2
+- Connection Pooling : **HikariCP**
+- Utility :
+  	- **Spring Scheduling**  	(트래픽이 많고, 저장되어 있는 데이터가 많음을 염두에 두어 인기 키워드 생성은 배치로 5초마다 생성)
+  	- **Resilience4j**  		(API 장애 발생 대응 사용)
+  	- **QueryDSL** 			(복잡한 쿼리 구성을 위해서 사용)
+  	- **Junit5**
+  	- **Log4j2**
 
 ====================================================
 
@@ -154,31 +159,43 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
 
 ## 6 참고 자료
 - Search API
+
 https://developers.kakao.com/docs/latest/ko/daum-search/dev-guide#search-blog
+
 https://developers.naver.com/docs/serviceapi/search/blog/blog.md
 
 - H2 Database
+
 http://www.h2database.com/html/features.html#connection_modes
+
 https://www.baeldung.com/spring-boot-h2-database
 	
 - Resilience4j - Circuit Breaker
+
 https://resilience4j.readme.io/docs/circuitbreaker
 
 - QueryDSL
+
 https://velog.io/@juhyeon1114/Spring-QueryDsl-gradle-%EC%84%A4%EC%A0%95-Spring-boot-3.0-%EC%9D%B4%EC%83%81
 
 - JPA
+
 https://data-make.tistory.com/621
 
 - Cache 검토
+
 https://gosunaina.medium.com/cache-redis-ehcache-or-caffeine-45b383ae85ee
 
 - ExceptionHandling
+
 https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC#controlleradvice-vs-restcontrolleradvice
 
 - TaskSchedule
+
 https://www.baeldung.com/spring-task-scheduler
 
 - GPT
+
 https://chat.openai.com/share/ffcbb912-6af9-41c0-9057-05b977545612
+
 https://wrtn.ai/share/zf52CubFFq
