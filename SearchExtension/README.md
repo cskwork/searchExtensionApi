@@ -4,7 +4,9 @@
 2) 프로젝트 설명 하단
 3) Download link 
 
-4) java -jar 실행 JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17
+4) 빌드 실행  
+java -jar SearchExtension-0.0.1-SNAPSHOT.jar 
+- JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17
 5) 실행 URL
 	- http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=10
 	- http://localhost:8080/popularKeyword
@@ -108,7 +110,7 @@
 ====================================================
 ## 5 프로젝트 구조
 
-```md
+```md             
 ├─main
 │  ├─generated					 # dsl Q클래스 파일
 │  │  └─com
@@ -131,6 +133,7 @@
 │  │              │  │  └─utils			 # Common Utility
 │  │              │  └─domain			 # Entity
 │  │              │      └─model		 # DTO
+│  │              ├─config				 # 모듈 설정
 │  │              └─scheduledTask # 배치 모듈
 │  └─resources
 │      ├─db
