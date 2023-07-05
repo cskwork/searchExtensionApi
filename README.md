@@ -66,10 +66,15 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
 ## 2 개발 환경 
 
 - Language : **Java 17**
-- FrameWork : **Spring Boot 3.1.1.RELEASE + Spring JPA + QueryDsl + Junit 5**
+- FrameWork : **Spring Boot 3.1.1.RELEASE + Spring JPA**
 - Database : **H2 2.1.214.RELEASE** 
-- Connection Pooling : HikariCP
-- Utility : ScheduleTask, Resilience4j, Log4j2
+- Connection Pooling : **HikariCP**
+- Utility :
+  	- **Spring Scheduling**  	(트래픽이 많고, 저장되어 있는 데이터가 많음을 염두에 두어 인기 키워드 생성은 배치로 5초마다 생성)
+  	- **Resilience4j**  		(API 장애 발생 대응 사용)
+  	- **QueryDSL** 			(복잡한 쿼리 구성을 위해서 사용)
+  	- **Junit5**
+  	- **Log4j2**
 
 ====================================================
 
