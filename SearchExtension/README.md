@@ -2,15 +2,17 @@
 
 1) 지원자 정보 : 2126-000513_채성국_서버 개발자
 2) 프로젝트 설명 하단
-3) Download link 
-
+3) 다운로드 링크
+	https://github.com/cskwork/searchCustomizer/raw/main/SearchExtension/jar/SearchExtension-0.0.1-SNAPSHOT.jar
 4) 빌드 실행  
-java -jar SearchExtension-0.0.1-SNAPSHOT.jar 
-- JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17
+	java -jar SearchExtension-0.0.1-SNAPSHOT.jar 
+	(JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17)
 5) 실행 URL
 	- http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=10
 	- http://localhost:8080/popularKeyword
+	
 ====================================================
+
 ## 목차
 1 과제 기능 요구사항
 
@@ -71,12 +73,12 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
 
 ## 3 DB 모델링 
 
-| POPULAR_KEYWORD | (블로그 인기 검색어 목록)  	  |			  |   |	  |  			
-|-----------------|---------------------------|-----------|---|---|
-| KEYWORD_ID      | NUMBER                    | PK        |   |   |
-| KEYWORD         | VARCHAR                   | NOT NULL  |   |   |
-| COUNT           | NUMBER                    | DEFAULT 0 |   |   |
-| CREATED_TIME    | TIMESTAMP                 | NOT NULL  |   |   |
+| POPULAR_KEYWORD | (블로그 인기 검색어 목록)  	  |			  | 		
+|-----------------|---------------------------|-----------|
+| KEYWORD_ID      | NUMBER                    | PK        |
+| KEYWORD         | VARCHAR                   | NOT NULL  | 
+| COUNT           | NUMBER                    | DEFAULT 0 | 
+| CREATED_TIME    | TIMESTAMP                 | NOT NULL  |
 
 
 | SEARCH_KEYWORD_HISTORY | (블로그 검색 기록)	  |           |
@@ -108,6 +110,7 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
 		display	Integer	N	한 번에 표시할 검색 결과 개수(기본값: 10, 최댓값: 100)
 	
 ====================================================
+
 ## 5 프로젝트 구조
 
 ```md             
@@ -144,6 +147,8 @@ java -jar SearchExtension-0.0.1-SNAPSHOT.jar
             └─search
                 └─extension		 # 테스트 케이스 모듈
 ```
+
+====================================================
 
 ## 6 참고 자료
 - Search API
