@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.search.extension.apiSearch.adapter.persistence.PopularKeywordQueryRepository;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
-import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
-import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.PopularKeywordDTO;
 
 @SpringBootTest
@@ -40,17 +38,12 @@ public class ApiSearchControllerTest {
     }
 
 	@Test
-	void testKakaoSearch() throws Exception {
+	void testApiSearch() throws Exception {
 		String query = "cat";
 		String sort = "accuracy";
 		int page = 1;
 		int pageSize = 1;
-		
-		// Stub
-		BlogSearchResultDTO expectedResult = new KakaoBlogSearchResultDTO();
-		when(apiSearchService.getApiSearchResults(query, sort, page, pageSize))
-			.thenReturn(expectedResult);
-		
+
         // HTTP GET 요청 Mock
 		MockHttpServletResponse response = mockMvc
 				.perform(get("/search")

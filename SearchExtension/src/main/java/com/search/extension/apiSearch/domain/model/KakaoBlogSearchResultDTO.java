@@ -25,11 +25,4 @@ public class KakaoBlogSearchResultDTO implements BlogSearchResultDTO {
 		private String thumbnail; 	  // 썸네일
 		private String datetime; 	  // 문서 글 작성시간, ISO 8601 [YYYY]-[MM]-[DD]T[hh]:[mm]:[ss].000+[tz]
 	}
-	
-    public boolean isEmpty() {
-        return (meta == null || documents.isEmpty());
-       // Add more conditions for remaining fields
-    }
-    
-
 }

@@ -1,16 +1,19 @@
 package com.search.extension.apiSearch.application.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.KakaoBlogSearchService;
-import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
+import com.search.extension.apiSearch.domain.model.ErrorResponse;
 import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
 
 import lombok.extern.log4j.Log4j2;
@@ -28,13 +31,15 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
     private WebClient kakaoApiWebClient;
 
 	@Override
-	public BlogSearchResultDTO getApiSearchResults(String query, String sort, int page, int size) {
+	public Map<String, Object> getApiSearchResults(String query, String sort, Pageable pageable) {
+		int currentPage =  pageable.getPageNumber() ;
+		int pageSize = pageable.getPageSize();
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder
 				.fromPath(apiEndpoint)
 				.queryParam("query", query)
 				.queryParam("sort", sort)
-				.queryParam("page", page)
-				.queryParam("size", size);
+				.queryParam("page", currentPage)
+				.queryParam("size", pageSize);
 
 		String url = uriBuilder.toUriString();
 		log.info("URL : " + url);
@@ -45,9 +50,33 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 	            .bodyToMono(KakaoBlogSearchResultDTO.class);
 	    
 	    KakaoBlogSearchResultDTO responseEntity = responseMono.block();
+	  
 	    log.info("KAKAO SEARCH SUCCESS");
-		return responseEntity;
+	    
+		Map<String, Object> response = new HashMap<>();
+		int totalPages = responseEntity.getMeta().getPageable_count() ;
+		int totalItemCount =  responseEntity.getMeta().getTotal_count();
+		int pageCount = calculatePagesCount( pageSize, totalItemCount);
+		
+		if ( currentPage > totalPages ) {
+			throw new ApiRequestsFailedException(ErrorResponse.PAGE_OUT_OF_BOUNDS);
+		}
+		
+		if(totalItemCount > 2500 ){
+			totalItemCount = 2500;
+		}
+		if(totalPages > 50){
+			totalPages = 50;
+		}
+		
+	    response.put("searchResult", responseEntity);
+	    response.put("currentPage", currentPage);
+	    response.put("totalItems", totalItemCount);
+	    response.put("totalPages", totalPages);
+		return response;
 	}
 	
-
+	public static int calculatePagesCount(long pageSize, long totalCount) {
+		return totalCount < pageSize ? 1 : (int) Math.ceil((double) totalCount / (double) pageSize);
+	}
 }
