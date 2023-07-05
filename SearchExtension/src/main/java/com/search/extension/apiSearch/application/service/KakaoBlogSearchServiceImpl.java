@@ -54,25 +54,24 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 	    log.info("KAKAO SEARCH SUCCESS");
 	    
 		Map<String, Object> response = new HashMap<>();
-		int totalPages = responseEntity.getMeta().getPageable_count() ;
 		int totalItemCount =  responseEntity.getMeta().getTotal_count();
 		int pageCount = calculatePagesCount( pageSize, totalItemCount);
 		
-		if ( currentPage > totalPages ) {
+		if ( currentPage > pageCount ) {
 			throw new ApiRequestsFailedException(ErrorResponse.PAGE_OUT_OF_BOUNDS);
 		}
 		
 		if(totalItemCount > 2500 ){
 			totalItemCount = 2500;
 		}
-		if(totalPages > 50){
-			totalPages = 50;
+		if(pageCount > 50){
+			pageCount = 50;
 		}
 		
 	    response.put("searchResult", responseEntity);
 	    response.put("currentPage", currentPage);
 	    response.put("totalItems", totalItemCount);
-	    response.put("totalPages", totalPages);
+	    response.put("totalPages", pageCount);
 		return response;
 	}
 	
