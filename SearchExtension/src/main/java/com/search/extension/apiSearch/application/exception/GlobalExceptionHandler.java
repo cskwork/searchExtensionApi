@@ -29,13 +29,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	    			   , ex.getMessage()
     			   )
     			   , HttpStatus.valueOf(500));
-    }
-    
-    /*
-     * MissingServletRequestParameterException.class: request parameter가 없을 때 에러를 리턴한다.
-MissingRequestHeaderException.class: request header가 없을 때 에러를 리턴한다.
-MethodArgumentNotValidException.class: request body의 데이터가 유효하지 않을 때 에러를 리턴한다.
-NoHandlerFoundException.class: 404 error를 리턴한다.
-     */
-    
+    }   
 }
