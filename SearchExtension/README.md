@@ -3,11 +3,13 @@
 1) 지원자 정보 : 2126-000513_채성국_서버 개발자
 2) 프로젝트 설명 하단
 3) 다운로드 링크
-	https://github.com/cskwork/searchCustomizer/raw/main/SearchExtension/jar/SearchExtension-0.0.1-SNAPSHOT.jar
-4) 빌드 실행  
-	java -jar SearchExtension-0.0.1-SNAPSHOT.jar 
-	(JDK 17 이상 사용 (Spring Boot 3.0 이상 호환) https://jdk.java.net/java-se-ri/17)
-5) 실행 URL
+	
+ 	- https://github.com/cskwork/searchCustomizer/raw/main/SearchExtension/jar/SearchExtension-0.0.1-SNAPSHOT.jar
+4) 빌드 실행 (JDK 17 이상 사용 (Spring Boot 3.0 이상 호환 - https://jdk.java.net/java-se-ri/17)
+```bash
+java -jar SearchExtension-0.0.1-SNAPSHOT.jar
+```
+6) 실행 URL
 	- http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=10
 	- http://localhost:8080/popularKeyword
 	
