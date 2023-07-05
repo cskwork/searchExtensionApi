@@ -24,7 +24,7 @@ public class ApiSearchController {
 	  @Autowired
 	  private  ApiBlogSearchService apiSearchService;
 	  /**
-	   *  키워드를 통해 블로그를 검색 (Sorting, Pagination 기능 지원)
+	   * 키워드를 통해 블로그를 검색 (Sorting, Pagination 기능 지원)
 	   * http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=1
 	   * @param query
 	   * @param sort (accuracy = 정확도순 ,recency = 최신순)
@@ -35,10 +35,10 @@ public class ApiSearchController {
 	  @GetMapping("/search")
 	  public ResponseEntity<ResponseDTO<BlogSearchResultDTO>> getApiSearchResults
 	  		(
-	          @RequestParam (value = "query", required = false) 						 	String query,
-	          @RequestParam (value = "sort", 	 defaultValue = "accuracy", required = false) 							String sort,
-	          @RequestParam (value = "page", 	 defaultValue = "1", required = false) 		int page,
-	          @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize
+	          @RequestParam (value = "query", required = false) 					String query,
+	          @RequestParam (value = "sort",     defaultValue = "accuracy", required = false) 	String sort,
+	          @RequestParam (value = "page",     defaultValue = "1", required = false) 		int page,
+	          @RequestParam (value = "pageSize", defaultValue = "10", required = false) 		int pageSize
 	        ) 
 	  {  
 		if (StringUtils.isBlank(query)) {
