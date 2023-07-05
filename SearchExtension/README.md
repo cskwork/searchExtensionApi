@@ -11,7 +11,9 @@
 - 4.1 카카오 API
 - 4.2 네이버 API
 
-5 참고 자료 
+5 프로젝트 구조
+
+6 참고 자료 
 
 ====================================================
 
@@ -58,18 +60,21 @@
 
 ## 3 DB 모델링 
 
-POPULAR_KEYWORD 	 		 (블로그 인기 검색어 목록)
-	KEYWORD_ID		NUMBER 		PK
-	KEYWORD			VARCHAR		NOT NULL
-	COUNT			NUMBER		DEFAULT 0
-	CREATED_TIME	TIMESTAMP	NOT NULL
-	
-SEARCH_KEYWORD_HISTORY		 (블로그 검색 기록)
-	KEYWORD_ID		NUMBER 		PK
-	KEYWORD			VARCHAR		NOT NULL
-	COUNT			NUMBER		DEFAULT 0
-	API_SOURCE		VARCHAR		NOT NULL
-	CREATED_TIME	TIMESTAMP	NOT NULL
+| POPULAR_KEYWORD | (블로그 인기 검색어 목록)  	  |			  |   |	  |  			
+|-----------------|---------------------------|-----------|---|---|
+| KEYWORD_ID      | NUMBER                    | PK        |   |   |
+| KEYWORD         | VARCHAR                   | NOT NULL  |   |   |
+| COUNT           | NUMBER                    | DEFAULT 0 |   |   |
+| CREATED_TIME    | TIMESTAMP                 | NOT NULL  |   |   |
+
+
+| SEARCH_KEYWORD_HISTORY | (블로그 검색 기록)	  |           |
+|------------------------|--------------------|-----------|
+| KEYWORD_ID             | NUMBER             | PK        |
+| KEYWORD                | VARCHAR            | NOT NULL  |
+| COUNT                  | NUMBER             | DEFAULT 0 |
+| API_SOURCE             | VARCHAR            | NOT NULL  |
+| CREATED_TIME           | TIMESTAMP          | NOT NULL  |
 	
 ====================================================	
 	
@@ -92,12 +97,61 @@ SEARCH_KEYWORD_HISTORY		 (블로그 검색 기록)
 		display	Integer	N	한 번에 표시할 검색 결과 개수(기본값: 10, 최댓값: 100)
 	
 ====================================================
+## 5 프로젝트 구조
 
-## 5 참고 자료
+```md
+├─main
+│  ├─generated					 # dsl Q클래스 파일
+│  │  └─com
+│  │      └─search
+│  │          └─extension
+│  │              └─apiSearch
+│  │                  └─domain
+│  ├─java
+│  │  └─com
+│  │      └─search
+│  │          └─extension
+│  │              ├─apiSearch     # 검색 모듈
+│  │              │  ├─adapter
+│  │              │  │  ├─persistence	 # Repository
+│  │              │  │  └─web			 # Controller
+│  │              │  ├─application
+│  │              │  │  ├─exception		 # ExceptionHandlers	
+│  │              │  │  ├─port			 # Interface
+│  │              │  │  ├─service		 # Business Logic
+│  │              │  │  └─utils			 # Common Utility
+│  │              │  └─domain			 # Entity
+│  │              │      └─model		 # DTO
+│  │              └─scheduledTask # 배치 모듈
+│  └─resources
+│      ├─db
+│      └─META-INF
+└─test
+    └─java
+        └─com
+            └─search
+                └─extension		 # 테스트 케이스 모듈
+```
 
-https://velog.io/@bey1548/spring-boot-configuration-processor
+## 6 참고 자료
+- Search API
+https://developers.kakao.com/docs/latest/ko/daum-search/dev-guide#search-blog
+https://developers.naver.com/docs/serviceapi/search/blog/blog.md
+- H2 Database
+http://www.h2database.com/html/features.html#connection_modes
+https://www.baeldung.com/spring-boot-h2-database	
+- Resilience4j - Circuit Breaker
+https://resilience4j.readme.io/docs/circuitbreaker
+- QueryDSL
+https://velog.io/@juhyeon1114/Spring-QueryDsl-gradle-%EC%84%A4%EC%A0%95-Spring-boot-3.0-%EC%9D%B4%EC%83%81
+- JPA
 https://data-make.tistory.com/621
+- Cache 검토
 https://gosunaina.medium.com/cache-redis-ehcache-or-caffeine-45b383ae85ee
+- ExceptionHandling
+https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC#controlleradvice-vs-restcontrolleradvice
+- TaskSchedule
+https://www.baeldung.com/spring-task-scheduler
+- GPT
 https://chat.openai.com/share/ffcbb912-6af9-41c0-9057-05b977545612
 https://wrtn.ai/share/zf52CubFFq
-https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC#controlleradvice-vs-restcontrolleradvice
