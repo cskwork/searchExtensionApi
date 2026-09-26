@@ -1,0 +1,16 @@
+{
+  "name": "search-extension-api-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "searchExtensionApi 원본 계약 기반 API 탐색기 (모의 응답, 외부 검색 API 호출 없음)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "extract": "node scripts/extract-contract.mjs",
+    "check:contract": "node scripts/extract-contract.mjs --check",
+    "test": "node --test test/*.test.mjs",
+    "build": "node scripts/extract-contract.mjs --check && node scripts/build.mjs"
+  }
+}
