@@ -19,22 +19,22 @@ export const CONTRACT = Object.freeze({
       {
         "key": "exceptionHandler",
         "path": "SearchExtension/src/main/java/com/search/extension/apiSearch/application/exception/GlobalExceptionHandler.java",
-        "sha256": "b0b6ac2c0a8d7d2e601ce1ed0bcb595bf69597949de7e6f402fb3d9695e5045b"
+        "sha256": "7f7862a897eb3df7f93f0b97aaacdd4a79338c2fe1addb1f1c522ffbde9e7b64"
       },
       {
         "key": "orchestration",
         "path": "SearchExtension/src/main/java/com/search/extension/apiSearch/application/service/ApiBlogSearchServiceImpl.java",
-        "sha256": "92649013dfd898aa7384a1dacd3a5326c4a2df821142466aff0e84635c7498da"
+        "sha256": "cb812816d6514da8f92a5dbc3a6a40fb16123d02211174cebb501da5e9a551b1"
       },
       {
         "key": "kakaoService",
         "path": "SearchExtension/src/main/java/com/search/extension/apiSearch/application/service/KakaoBlogSearchServiceImpl.java",
-        "sha256": "9139f7a6ec79471b2a1df96626bfa394a87648906883898cee428fb2412a5f0a"
+        "sha256": "2b422211f0c4776ff0b213b4b680d64c9bfb6ebe2a067f1aac27e0c6dfbb8d02"
       },
       {
         "key": "naverService",
         "path": "SearchExtension/src/main/java/com/search/extension/apiSearch/application/service/NaverBlogSearchServiceImpl.java",
-        "sha256": "4f29c57623ab9ae1618e983510f1dfc8dafc2a9df5a357641f617a09a8059d99"
+        "sha256": "ffc7299bc8665a0a86d3b3556ca0732b94d1c6c53fe32cca89de81d77c273154"
       },
       {
         "key": "popularRepository",
@@ -44,7 +44,7 @@ export const CONTRACT = Object.freeze({
       {
         "key": "scheduler",
         "path": "SearchExtension/src/main/java/com/search/extension/scheduledTask/TaskSchedulerConfig.java",
-        "sha256": "8bf60a17c84966e14d646bcd3948a73c3cad6c721ca992d1f0d7ad781e5d10ad"
+        "sha256": "9893b6fb1ff0342c99e597b6dbafaaa166d9bf33f27c5b8f374647438cbf856f"
       },
       {
         "key": "errors",
@@ -218,7 +218,7 @@ export const CONTRACT = Object.freeze({
         },
         {
           "name": "start",
-          "source": "pageable.getPageNumber()"
+          "source": "startOffset"
         },
         {
           "name": "display",

@@ -1,0 +1,21 @@
+{
+  "unit": {
+    "passed": 54,
+    "failed": 0,
+    "baselineTests": 50
+  },
+  "demoDom": 33,
+  "liveDom": 11,
+  "native": {
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "freshGradleBuild": true,
+  "nativeJarContainsLiveConsole": true,
+  "historicalDatabasePackaged": false,
+  "browserUsed": false,
+  "realProviderUsed": false,
+  "deployed": false
+}

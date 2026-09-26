@@ -1,0 +1,6 @@
+.env
+.env.local
+.env.*.local
+/verification/*.log
+/SearchExtension/jar/
+/SearchExtension/src/main/resources/db/*.db

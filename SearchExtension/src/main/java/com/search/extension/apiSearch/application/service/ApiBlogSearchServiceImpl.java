@@ -54,6 +54,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 		boolean isValidParameter = ExceptionHandlerUtil.isValidParameter(sort, pageable.getPageSize(), pageable.getPageNumber());
 		log.info("isValidParameter : " + isValidParameter);
 
+		java.util.concurrent.atomic.AtomicBoolean usedNaver = new java.util.concurrent.atomic.AtomicBoolean(false);
 		CircuitBreaker firstCircuitBreaker = circuitBreakerRegistry.circuitBreaker("kakaoApi");
 		CircuitBreaker secondCircuitBreaker = circuitBreakerRegistry.circuitBreaker("naverApi");
 		CheckedFunction0<Map<String, Object>> firstApiCall = CircuitBreaker
@@ -62,7 +63,7 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 					log.info("Using "+ApiConstants.KAKAO_NAME+" API");
 					Map<String, Object> searchResult = kakaoApi.getApiSearchResults(query, sort, pageable);
 					if (searchResult != null) {
-						addPopularKeyword(query, 1, ApiConstants.KAKAO_NAME);
+						usedNaver.set(false);
 					}	
 					return searchResult;
 				});
@@ -72,12 +73,12 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 					log.info("Using "+ApiConstants.NAVER_NAME+" API");
 					Map<String, Object> searchResult = naverApi.getApiSearchResults(query, sort, pageable);
 					if (searchResult != null) {
-						addPopularKeyword(query, 1, ApiConstants.NAVER_NAME);
+						usedNaver.set(true);
 					}
 					return searchResult;
 				});
 
-		return Try.of(firstApiCall)
+		Map<String,Object> result = Try.of(firstApiCall)
 				.recoverWith(throwable -> Try.of(secondApiCall))
 				// API 하단에 추가 
 				// 예) .recoverWith(throwable -> Try.of(thirdApiCall))
@@ -92,6 +93,15 @@ public class ApiBlogSearchServiceImpl implements ApiBlogSearchService {
 					log.error("VALUE NOT PRESENT");
 					throw new ApiRequestsFailedException(ErrorResponse.INTERNAL_SERVER_ERROR);
 				});
+        // Persist only after provider selection. A storage failure must never trigger a second provider call.
+        if(result==null)throw new ApiRequestsFailedException(ErrorResponse.API_CALL_FAIL);
+        try {
+            if(!usedNaver.get())addPopularKeyword(query, 1, ApiConstants.KAKAO_NAME);
+            else addPopularKeyword(query, 1, ApiConstants.NAVER_NAME);
+        } catch (org.springframework.dao.DataAccessException error) {
+            throw new ApiRequestsFailedException(ErrorResponse.INTERNAL_SERVER_ERROR);
+        }
+        return result;
 	}
 	@Override
 	public List<PopularKeywordDTO> getPopularKeyword() {

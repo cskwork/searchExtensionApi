@@ -37,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     	   return new ResponseEntity<>(new ErrorResponseDTO
     			   (
 	    			   500
-	    			   , ex.getMessage()
+                       , ErrorResponse.INTERNAL_SERVER_ERROR.getMessage()
     			   )
     			   , HttpStatus.valueOf(500));
     }   

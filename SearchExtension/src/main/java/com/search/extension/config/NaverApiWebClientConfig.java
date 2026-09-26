@@ -23,7 +23,6 @@ public class NaverApiWebClientConfig {
     public WebClient naverApiWebClient() {
         return WebClient.builder()
                 .baseUrl(naverApiBaseUrl)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + naverApiClientSecret)
                 .defaultHeader("X-Naver-Client-Id", naverApiClientId)
                 .defaultHeader("X-Naver-Client-Secret", naverApiClientSecret)
                 .build();

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="searchExtensionApi 블로그 검색 API 의 원본 계약을 모의 응답으로 체험하는 API 탐색기">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>searchExtensionApi 탐색기 · 모의 응답</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body data-mode="live">
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <p class="notice" role="note" id="demo-notice">searchExtensionApi 체험 · 원본 API 계약 기반 · 모의 응답 · 외부 검색 API 호출 없음</p>
+
+  <header class="site-header"><div class="environment-bar"><strong id="environment-mode">모의 환경 · 브라우저 내부 실행</strong><a id="environment-link" href="live.html">실서버 콘솔 열기</a></div>
+    <h1>검색 API 진단 콘솔</h1>
+    <p class="lede">요청을 바꾸고 공급자 장애를 재현해 보세요. 원본 Java 계약에 따른 모의 응답만 이 브라우저 안에서 실행합니다.</p>
+  </header>
+
+  <main id="main" class="layout">
+    <section class="panel request" aria-labelledby="request-title">
+      <h2 id="request-title">요청 <code>GET /search</code></h2>
+      <div class="scenarios" role="group" aria-label="모의 시나리오 실행">
+        <button type="button" data-scenario="normal">정상 검색</button>
+        <button type="button" data-scenario="fallback">카카오 장애</button>
+        <button type="button" data-scenario="failure">모두 장애</button>
+        <button type="button" data-scenario="invalid">잘못된 입력</button>
+      </div>
+      <p class="hint">시나리오를 누르면 요청과 공급자 설정을 채우고 바로 실행합니다.</p>
+      <p id="draft-note" class="hint" role="status" hidden></p>
+      <form id="search-form" novalidate>
+        <div class="field">
+          <label for="query">query <span class="hint">검색어 (필수)</span></label>
+          <input id="query" name="query" type="search" autocomplete="off" value="spring boot" maxlength="100">
+        </div>
+        <div class="examples" aria-label="예시 검색어">
+          <span class="hint">예시</span>
+          <button type="button" class="chip" data-example="spring boot">spring boot · 결과 많음</button>
+          <button type="button" class="chip" data-example="서킷브레이커">서킷브레이커 · 42건</button>
+          <button type="button" class="chip" data-example="h2 database">h2 database · 7건</button>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="sort">sort</label>
+            <select id="sort" name="sort"></select>
+          </div>
+          <div class="field">
+            <label for="page">page <span class="hint" id="page-hint"></span></label>
+            <input id="page" name="page" type="text" inputmode="numeric" value="1" aria-describedby="page-hint">
+          </div>
+          <div class="field">
+            <label for="pageSize">pageSize <span class="hint" id="size-hint"></span></label>
+            <input id="pageSize" name="pageSize" type="text" inputmode="numeric" value="10" aria-describedby="size-hint">
+          </div>
+        </div>
+        <p class="hint">빈 칸은 파라미터를 보내지 않은 것으로 처리합니다. 범위 밖 값이나 숫자가 아닌 값도 그대로 보내 오류 응답을 확인할 수 있습니다.</p>
+
+        <fieldset class="providers">
+          <legend>공급자 상태 시뮬레이션</legend>
+          <div class="provider">
+            <span class="provider-name" id="kakao-label">카카오 (1순위)</span>
+            <label><input type="radio" name="kakao" value="up" checked> 정상</label>
+            <label><input type="radio" name="kakao" value="down"> 장애</label>
+          </div>
+          <div class="provider">
+            <span class="provider-name" id="naver-label">네이버 (대체)</span>
+            <label><input type="radio" name="naver" value="up" checked> 정상</label>
+            <label><input type="radio" name="naver" value="down"> 장애</label>
+          </div>
+        </fieldset>
+
+        <div class="request-actions"><button type="submit" class="primary">요청 보내기</button><button type="button" id="cancel-request" hidden>요청 취소</button></div>
+      </form>
+
+    </section>
+
+    <section class="panel response" aria-labelledby="response-title">
+      <h2 id="response-title" tabindex="-1">응답</h2>
+      <div id="status" class="status" role="status" aria-live="polite">요청을 보내면 결과가 여기에 표시됩니다.</div>
+      <p class="request-line"><code id="request-line"></code></p>
+
+      <p id="response-context" class="hint"></p>
+      <div class="response-tabs" role="tablist" aria-label="응답 보기">
+        <button type="button" id="tab-results" role="tab" aria-selected="true" aria-controls="panel-results" tabindex="0">결과</button>
+        <button type="button" id="tab-json" role="tab" aria-selected="false" aria-controls="panel-json" tabindex="-1">JSON</button>
+        <button type="button" id="tab-trace" role="tab" aria-selected="false" aria-controls="panel-trace" tabindex="-1">처리 흐름</button>
+      </div>
+      <div id="panel-results" class="response-pane" role="tabpanel" aria-labelledby="tab-results" tabindex="0">
+        <p id="result-empty" class="empty">위 시나리오를 선택하거나 요청을 보내 보세요.</p>
+        <button type="button" id="recover-request" hidden>정상 설정으로 복구 실행</button>
+
+      <div id="results" class="results" hidden>
+        <h3 class="results-title">검색 결과 <span id="result-summary" class="hint"></span></h3>
+        <ul id="result-list" class="result-list"></ul>
+        <nav class="pager" aria-label="검색 결과 페이지">
+          <button type="button" id="prev-page">이전 페이지</button>
+          <span id="page-status"></span>
+          <button type="button" id="next-page">다음 페이지</button>
+        </nav>
+      </div>
+
+      </div>
+      <div class="json response-pane" id="panel-json" role="tabpanel" aria-labelledby="tab-json" tabindex="0" hidden>
+        <div class="json-head">
+          <h3 id="json-title">응답 JSON</h3>
+          <button type="button" id="copy-json">복사</button>
+        </div>
+        <pre id="json-view" tabindex="0" aria-labelledby="json-title"><code>{}</code></pre>
+      </div>
+      <div class="trace response-pane" id="panel-trace" role="tabpanel" aria-labelledby="tab-trace" tabindex="0" hidden>
+        <h3>처리 흐름 · 원본 코드 경로</h3>
+        <ol id="trace"></ol>
+      </div>
+    </section>
+
+    <section class="panel history" aria-labelledby="history-title">
+      <div class="popular-head"><h2 id="history-title">최근 요청</h2><button type="button" id="history-clear">이력 지우기</button></div>
+      <p class="hint">최근 5건 · 설정 불러오기는 실행하지 않습니다. 검색은 성공한 요청마다 1회 집계합니다.</p>
+      <p id="history-alert" class="alert" role="status" hidden></p>
+      <ol id="history-list" class="history-list"></ol>
+      <p id="history-empty" class="empty">실행한 요청이 여기에 쌓입니다.</p>
+    </section>
+      <section class="panel popular" aria-labelledby="popular-title">
+        <div class="popular-head">
+          <h2 id="popular-title">인기 검색어 <code>GET /popularKeyword</code></h2>
+          <div class="actions">
+            <button type="button" id="popular-json">JSON 보기</button>
+            <button type="button" id="popular-reset">초기화</button>
+          </div>
+        </div>
+        <p class="hint" id="popular-note"></p>
+        <p class="alert" id="storage-alert" role="status" hidden></p>
+        <ol id="popular-list" class="popular-list"></ol>
+        <p class="empty" id="popular-empty">아직 검색 기록이 없습니다.</p>
+      </section>
+    <details class="panel contract" aria-labelledby="contract-title">
+      <summary id="contract-title">원본 계약과 출처 보기</summary>
+
+      <p>아래 값은 빌드할 때 원본 Java 소스에서 직접 추출했습니다. 모의 어댑터도 같은 값을 사용합니다.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="계약 표, 좌우 스크롤 가능">
+        <table>
+          <caption>GET /search 파라미터 (ApiSearchController)</caption>
+          <thead><tr><th scope="col">이름</th><th scope="col">Java 타입</th><th scope="col">기본값</th><th scope="col">허용 범위</th></tr></thead>
+          <tbody id="param-rows"></tbody>
+        </table>
+      </div>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="계약 표, 좌우 스크롤 가능">
+        <table>
+          <caption>오류 응답 (ErrorResponse → HTTP 상태)</caption>
+          <thead><tr><th scope="col">코드</th><th scope="col">HTTP</th><th scope="col">message</th></tr></thead>
+          <tbody id="error-rows"></tbody>
+        </table>
+      </div>
+
+      <h3>공유 계약 케이스</h3>
+      <p>Java 테스트 <code>ApiSearchControllerContractTest</code> 가 사용하는 케이스 파일을 이 모의 어댑터로 실행합니다. 인기 검색어 기록에는 반영하지 않습니다.</p>
+      <button type="button" id="run-cases">케이스 실행</button>
+      <p id="case-summary" role="status" aria-live="polite"></p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="계약 표, 좌우 스크롤 가능">
+        <table id="case-table" hidden>
+          <caption>케이스 결과</caption>
+          <thead><tr><th scope="col">케이스</th><th scope="col">요청</th><th scope="col">기대</th><th scope="col">모의 응답</th></tr></thead>
+          <tbody id="case-rows"></tbody>
+        </table>
+      </div>
+
+      <h3>출처</h3>
+      <ul class="provenance">
+        <li>원본 저장소: <strong id="repo-name"></strong> — <span id="backend-name"></span></li>
+        <li id="hosting"></li>
+        <li>외부 검색 API(카카오, 네이버)는 호출하지 않습니다. 검색 문서는 질의어로부터 결정적으로 만든 모의 데이터이며 링크 필드는 비워 둡니다.</li>
+        <li>원본은 검색 기록을 저장하고 <span id="batch-seconds"></span>초 배치로 인기 검색어를 갱신합니다. 체험판은 이 브라우저의 저장소에서 바로 집계합니다.</li>
+      </ul>
+      <details>
+        <summary>추출에 사용한 원본 파일 (SHA-256)</summary>
+        <ul id="source-files" class="source-files"></ul>
+      </details>
+    </details>
+  </main>
+</body>
+</html>

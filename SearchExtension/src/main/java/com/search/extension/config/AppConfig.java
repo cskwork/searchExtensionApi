@@ -31,7 +31,7 @@ public class AppConfig {
 			    .waitDurationInOpenState(Duration.ofMillis(1000))					// 반차단까직 대기하는 시간 : time that the CircuitBreaker should wait before transitioning from open to half-open.
 			    .permittedNumberOfCallsInHalfOpenState(2)							// 반차단에서 호출 허용
 			    .slidingWindowSize(2) 												// record the outcome of calls when the CircuitBreaker is closed
-			    .recordExceptions(IOException.class, TimeoutException.class) 		//  exceptions that are recorded as a failure and thus increase the failure rate
+			    .recordException(error -> !(error instanceof com.search.extension.apiSearch.application.exception.ApiRequestsFailedException)) 		//  exceptions that are recorded as a failure and thus increase the failure rate
 				.build();
 
 		CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(defaultConfig);

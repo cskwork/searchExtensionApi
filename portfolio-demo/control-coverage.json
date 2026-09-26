@@ -1,0 +1,14 @@
+{
+  "scope": "Two original endpoints; all explorer UI is new compatibility code",
+  "controls": {
+    "request form, omitted/default parameters, scenarios, pagination": "original mock-adapter.test.mjs + scripts/test-dom.mjs (33 checks)",
+    "tabs, keyboard navigation, detail toggles, JSON, history load/replay/clear, popular read/reset": "original scripts/test-dom.mjs",
+    "native environment, abort, latest-response guard, no demo store/control execution, safe links": "scripts/test-live-dom.mjs (11 checks)",
+    "native endpoint path, query allowlist, error envelope, timeout, abort, disconnect, malformed payload": "test/http-adapter.test.mjs",
+    "mode/server-scoped history": "test/http-adapter.test.mjs and test/explorer-state.test.mjs",
+    "native provider offset/timeout/persistence": "BlogSearchProviderHttpTest, ProviderLoopbackTest, ApiBlogSearchServiceFallbackTest",
+    "native aggregation transaction/concurrent search": "PopularAggregationTest",
+    "native HTTP endpoints and packaged live page": "NativeHttpContractTest"
+  },
+  "notVerified": "Browser layout, rendered accessibility, visual approval, real providers, operational deployment"
+}

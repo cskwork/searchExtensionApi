@@ -78,7 +78,7 @@ test('정렬: recency 는 최신순, 네이버는 accuracy→sim, recency→date
   assert.ok(naverAccuracy.trace.some((line) => line.includes('NaverBlogSearchService') && line.includes('sort=sim')));
 });
 
-test('카카오 장애 → 네이버 대체: NaverBlogSearchResultDTO 형식, start 에 page 값을 그대로 전달', () => {
+test('카카오 장애 → 네이버 대체: NaverBlogSearchResultDTO 형식, start 에 페이지별 문서 오프셋을 전달', () => {
   const keywords = memoryKeywords();
   const api = createSearchApi({ keywordStore: keywords });
   const response = api.search({ query: 'spring boot', page: '3', pageSize: '10' }, { kakao: 'down' });
@@ -87,7 +87,7 @@ test('카카오 장애 → 네이버 대체: NaverBlogSearchResultDTO 형식, st
   assert.equal(response.provider, 'Naver');
   assert.deepEqual(Object.keys(response.body.data.searchResult), fieldNames(dto.NaverBlogSearchResultDTO));
   for (const item of response.body.data.searchResult.items) assert.deepEqual(Object.keys(item), fieldNames(dto.Item));
-  assert.equal(response.body.data.searchResult.start, 3);
+  assert.equal(response.body.data.searchResult.start, 21);
   assert.equal(response.body.data.currentPage, 3);
   assert.ok(response.trace.includes('recoverWith → CircuitBreaker "naverApi"'));
   assert.ok(response.trace.includes('addPopularKeyword(query, 1, "Naver")'));
