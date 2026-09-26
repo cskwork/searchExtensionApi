@@ -68,7 +68,21 @@ dependencies {
 
 tasks.named('test') {
 	test {
-	    useJUnitPlatform ()
+	    // 실제 카카오/네이버 API 를 호출하는 테스트는 integrationTest 로 분리
+	    useJUnitPlatform {
+	        excludeTags 'integration'
+	    }
+	}
+}
+
+// 실행: SEARCH_API_LIVE_TESTS=true KAKAO_API_KEY=... NAVER_CLIENT_ID=... NAVER_CLIENT_SECRET=... ./gradlew integrationTest
+tasks.register('integrationTest', Test) {
+	description = 'Runs opt-in tests that call the live Kakao/Naver search APIs.'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+	    includeTags 'integration'
 	}
 }
 

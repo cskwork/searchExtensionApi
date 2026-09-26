@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.search.extension.apiSearch.application.exception.ApiRequestsFailedException;
 import com.search.extension.apiSearch.application.port.ApiBlogSearchService;
+import com.search.extension.apiSearch.application.utils.ExceptionHandlerUtil;
 import com.search.extension.apiSearch.domain.model.ApiConstants;
 import com.search.extension.apiSearch.domain.model.BlogSearchResultDTO;
 import com.search.extension.apiSearch.domain.model.ErrorResponse;
@@ -49,6 +50,8 @@ public class ApiSearchController {
 		if (StringUtils.isBlank(query)) {
 			throw new ApiRequestsFailedException(ErrorResponse.INVALID_NULL_PARAMETER);
 	    }
+		// PageRequest.of 는 page < 0, pageSize < 1 에서 IllegalArgumentException(500)을 던지므로 먼저 검증 (page 는 1부터 시작하는 외부 페이지 번호 그대로 전달)
+		ExceptionHandlerUtil.isValidParameter(sort, pageSize, page);
 		Pageable pageable = PageRequest.of(page, pageSize);
 		Map<String, Object> results = apiSearchService.getApiSearchResults(query, sort, pageable);
 		ResponseDTO<Map<String, Object>> response = new ResponseDTO<>(ApiConstants.SUCCESS, 200, results);
