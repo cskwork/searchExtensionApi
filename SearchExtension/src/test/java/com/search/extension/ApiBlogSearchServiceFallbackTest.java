@@ -130,6 +130,16 @@ public class ApiBlogSearchServiceFallbackTest {
 		verifyNoInteractions(kakaoApi, naverApi);
 	}
 
+    @Test void persistenceFailureDoesNotRetryProviderOrRecordCircuitFailure(){
+        when(kakaoApi.getApiSearchResults(anyString(),anyString(),any())).thenReturn(Map.of("currentPage",1));
+        when(keywordRepository.save(any())).thenThrow(new org.springframework.dao.DataAccessResourceFailureException("synthetic unavailable database"));
+        ApiRequestsFailedException error=assertThrows(ApiRequestsFailedException.class,()->service.getApiSearchResults("spring","accuracy",firstPage));
+        assertEquals(ErrorResponse.INTERNAL_SERVER_ERROR,error.getErrorResponse());verifyNoInteractions(naverApi);
+    }
+    @Test void emptyProviderResponseIsNotSavedAsSuccess(){
+        when(kakaoApi.getApiSearchResults(anyString(),anyString(),any())).thenReturn(null);
+        assertThrows(ApiRequestsFailedException.class,()->service.getApiSearchResults("spring","accuracy",firstPage));verify(keywordRepository,never()).save(any());
+    }
 	private SearchKeywordHistory savedHistory() {
 		ArgumentCaptor<SearchKeywordHistory> captor = ArgumentCaptor.forClass(SearchKeywordHistory.class);
 		verify(keywordRepository).save(captor.capture());

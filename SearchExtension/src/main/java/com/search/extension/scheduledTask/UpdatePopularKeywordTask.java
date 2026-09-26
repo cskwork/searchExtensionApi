@@ -10,7 +10,8 @@ import com.search.extension.apiSearch.adapter.persistence.PopularKeywordJpaRepos
 import com.search.extension.apiSearch.adapter.persistence.SearchKeywordHistoryQueryRepository;
 import com.search.extension.apiSearch.domain.PopularKeyword;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -28,23 +29,13 @@ public class UpdatePopularKeywordTask implements Runnable {
 	@Autowired
 	private SearchKeywordHistoryQueryRepository searchKeywordQueryRepository;
 
-	@Transactional
+	@Transactional(isolation=Isolation.REPEATABLE_READ)
 	public void updatePopularKeywordDatabase() {
 		List<PopularKeyword> popularKeywordList = searchKeywordQueryRepository.getGroupByApiSourceForKeyword();
 		
-		// 데이터 없는 경우
-		if (popularKeywordJpaRepository.count() == 0) {
-			for (PopularKeyword popularKeyword : popularKeywordList) {
-				popularKeywordJpaRepository.save(popularKeyword);
-			}
-			return;
-		}
-
-		// 기존 데이터가 있으면
-		popularKeywordJpaRepository.deleteAll();
-		for (PopularKeyword popularKeyword : popularKeywordList) {
-			popularKeywordJpaRepository.save(popularKeyword);
-		}
+        popularKeywordJpaRepository.deleteAllInBatch();
+        popularKeywordJpaRepository.saveAll(popularKeywordList);
+        popularKeywordJpaRepository.flush();
 		log.info("UpdatePopularKeywordTask success");
 		return;
 	}

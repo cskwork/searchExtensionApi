@@ -153,11 +153,12 @@ function kakaoSearch(query, sort, pageable, state, trace) {
   return providerResult('kakao', searchResult, currentPage, total, pageSize);
 }
 
-// NaverBlogSearchServiceImpl — 원본처럼 외부 page 값을 start(시작 문서 위치)로 전달합니다.
+// NaverBlogSearchServiceImpl — corrected one-based document offset.
 function naverSearch(query, sort, pageable, state, trace) {
   const { pageNumber: currentPage, pageSize } = pageable;
   const naverSort = CONTRACT.providers.naver.sortMap[sort] ?? sort;
-  const start = pageable.pageNumber;
+  const start = (currentPage - 1) * pageSize + 1;
+  if(start>1000)throw new ApiRequestsFailed('PAGE_OUT_OF_BOUNDS');
   trace.push(`NaverBlogSearchService 요청(모의): ${providerQuery('naver', { query, sort: naverSort, start, display: pageSize })}`);
   if (state.naver === 'down') throw new ProviderOutage('Naver');
   const total = corpusTotal(query, 'naver');
@@ -174,7 +175,9 @@ function naverSearch(query, sort, pageable, state, trace) {
     };
   });
   const searchResult = { lastBuildDate: 'Sat, 26 Sep 2026 09:00:00 +0900', total, start, display: count, items };
-  return providerResult('naver', searchResult, currentPage, total, pageSize);
+  const result = providerResult('naver', searchResult, currentPage, total, pageSize);
+  result.totalPages=Math.min(result.totalPages,Math.floor(999/pageSize)+1);
+  return result;
 }
 
 const PROVIDERS = [
@@ -200,16 +203,19 @@ export function createSearchApi({ keywordStore }) {
     for (const [index, provider] of PROVIDERS.entries()) {
       if (index > 0) trace.push(`recoverWith → CircuitBreaker "${provider.breaker}"`);
       else trace.push(`CircuitBreaker "${provider.breaker}"`);
+      let result;
       try {
-        const result = provider.call(query, sort, pageable, providerState, trace);
-        keywordStore.increment(query, provider.source.increment);
-        trace.push(`addPopularKeyword(query, ${provider.source.increment}, "${provider.source.apiSource}")`);
-        return { result, provider: provider.source.apiSource };
+        result = provider.call(query, sort, pageable, providerState, trace);
       } catch (error) {
         lastError = error;
         const reason = error instanceof ApiRequestsFailed ? `ApiRequestsFailedException(${error.errorName}), message=null` : error.message;
         trace.push(`${provider.source.apiSource} 실패: ${reason}`);
+        continue;
       }
+      try { keywordStore.increment(query, provider.source.increment); }
+      catch { trace.push('검색 기록 저장 실패 — 공급자를 다시 호출하지 않습니다.'); throw new ApiRequestsFailed('INTERNAL_SERVER_ERROR'); }
+      trace.push(`addPopularKeyword(query, ${provider.source.increment}, "${provider.source.apiSource}")`);
+      return { result, provider: provider.source.apiSource };
     }
     const errorName = lastError.javaMessage === null ? CONTRACT.orchestration.failureWithoutMessage : CONTRACT.orchestration.failureWithMessage;
     throw new ApiRequestsFailed(errorName);

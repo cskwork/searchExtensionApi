@@ -26,6 +26,9 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 	@Value("${kakao.api.blog-search-path}")
 	private String apiEndpoint;
 
+    @Value("${search.provider-timeout-ms:3000}")
+    private long timeoutMillis = 3000;
+
 	@Autowired
     @Qualifier("kakaoApiWebClient")
     private WebClient kakaoApiWebClient;
@@ -42,14 +45,14 @@ public class KakaoBlogSearchServiceImpl implements KakaoBlogSearchService {
 				.queryParam("size", pageSize);
 
 		String url = uriBuilder.toUriString();
-		log.info("URL : " + url);
+		log.debug("Calling configured search provider");
 		
 	    Mono<KakaoBlogSearchResultDTO> responseMono = kakaoApiWebClient.get()
 	            .uri(url)
 	            .retrieve()
 	            .bodyToMono(KakaoBlogSearchResultDTO.class);
 	    
-	    KakaoBlogSearchResultDTO responseEntity = responseMono.block();
+	    KakaoBlogSearchResultDTO responseEntity = responseMono.timeout(java.time.Duration.ofMillis(Math.max(100,Math.min(timeoutMillis,10000)))).block();
 	  
 	    log.info("KAKAO SEARCH SUCCESS");
 	    

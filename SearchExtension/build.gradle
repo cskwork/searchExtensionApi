@@ -101,3 +101,14 @@ clean {
     delete file(generated) // Querydsl - Remove QClass directory when doing `gradle clean`
 }
 // ======QUERYDSL ECLIPSE
+
+// The same-origin console is packaged with the actual two native endpoints.
+tasks.register('prepareConsole', Exec) {
+    workingDir '../portfolio-demo'
+    commandLine 'node', 'scripts/build.mjs'
+}
+tasks.named('processResources') {
+    dependsOn 'prepareConsole'
+    from('../portfolio-demo/dist') { into 'static/console' }
+    exclude 'db/**' // Never package the historic checked-in database.
+}

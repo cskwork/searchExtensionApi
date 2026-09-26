@@ -11,6 +11,12 @@
     "extract": "node scripts/extract-contract.mjs",
     "check:contract": "node scripts/extract-contract.mjs --check",
     "test": "node --test test/*.test.mjs",
-    "build": "node scripts/extract-contract.mjs --check && node scripts/build.mjs"
+    "build": "node scripts/extract-contract.mjs --check && node scripts/build.mjs",
+    "test:dom": "node scripts/test-dom.mjs",
+    "test:dom:live": "node scripts/test-live-dom.mjs",
+    "test:all": "npm test && npm run build && npm run test:dom && npm run test:dom:live"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
   }
 }

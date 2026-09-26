@@ -26,6 +26,9 @@ public class NaverBlogSearchServiceImpl implements NaverBlogSearchService {
 	@Value("${naver.api.blog-search-path}")
 	private String apiEndpoint;
 
+    @Value("${search.provider-timeout-ms:3000}")
+    private long timeoutMillis = 3000;
+
 	@Autowired
 	@Qualifier("naverApiWebClient")
 	private WebClient naverApiWebClient;
@@ -34,6 +37,8 @@ public class NaverBlogSearchServiceImpl implements NaverBlogSearchService {
 	public Map<String, Object> getApiSearchResults(String query, String sort, Pageable pageable) {
 		int currentPage =  pageable.getPageNumber() ;
 		int pageSize = pageable.getPageSize();
+        int startOffset = (currentPage - 1) * pageSize + 1;
+        if(startOffset>1000)throw new ApiRequestsFailedException(ErrorResponse.PAGE_OUT_OF_BOUNDS);
 		
 		if (sort.equals("accuracy")) {
 			sort = "sim";
@@ -44,16 +49,16 @@ public class NaverBlogSearchServiceImpl implements NaverBlogSearchService {
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(apiEndpoint)
 				.queryParam("query", query)
 				.queryParam("sort", sort)
-				.queryParam("start", pageable.getPageNumber())
+				.queryParam("start", startOffset)
 				.queryParam("display", pageSize);
 
 		String url = uriBuilder.toUriString();
-		log.info("URL : " + url);
+		log.debug("Calling configured search provider");
 
 		Mono<NaverBlogSearchResultDTO> responseMono = naverApiWebClient.get().uri(url).retrieve()
 				.bodyToMono(NaverBlogSearchResultDTO.class);
 
-		NaverBlogSearchResultDTO responseEntity = responseMono.block();
+		NaverBlogSearchResultDTO responseEntity = responseMono.timeout(java.time.Duration.ofMillis(Math.max(100,Math.min(timeoutMillis,10000)))).block();
 		log.info("NAVER SEARCH SUCCESS");
 
 		Map<String, Object> response = new HashMap<>();
@@ -75,7 +80,8 @@ public class NaverBlogSearchServiceImpl implements NaverBlogSearchService {
 			totalPages = 50;
 		}
 		
-		response.put("searchResult", responseEntity);
+		totalPages = Math.min(totalPages, 999 / pageSize + 1);
+        response.put("searchResult", responseEntity);
 		response.put("currentPage", currentPage);
 		response.put("totalItems", totalItemCount);
 		response.put("totalPages", totalPages);

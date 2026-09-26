@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-26T08:54:42.064741+00:00",
+  "title": "Design System: 검색 API 진단 콘솔",
+  "extensions": {
+    "shadows": [],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": ".15s",
+        "purpose": "Existing button color feedback; disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "max-1000px",
+        "value": "1000px"
+      },
+      {
+        "name": "max-860px",
+        "value": "860px"
+      },
+      {
+        "name": "max-520px",
+        "value": "520px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<button class=\"ds-primary\" type=\"button\">요청 보내기</button>",
+      "css": ".ds-primary{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;background:var(--accent,#245ec7);color:#fff;border:1px solid var(--accent,#245ec7);border-radius:6px;padding:0.6rem 1.2rem;min-height:46px;cursor:pointer;transition:background .15s;}.ds-primary:hover{background:#184898;}.ds-primary:focus-visible{outline:3px solid #527dde;outline-offset:3px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none;}}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<label class=\"ds-label\">검색어<input class=\"ds-input\" type=\"text\" placeholder=\"검색어 입력\"></label>",
+      "css": ".ds-label{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;display:block;font-weight:600;color:var(--ink,#20252d);}.ds-input{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;display:block;margin-top:6px;background:white;color:var(--ink,#20252d);border:1px solid #8b96a4;border-radius:6px;padding:0.5rem 0.6rem;min-height:42px;caret-color:var(--accent,#245ec7);}.ds-input:focus-visible{outline:3px solid #527dde;outline-offset:3px;}",
+      "refersTo": "input"
+    },
+    {
+      "name": "Current navigation",
+      "kind": "nav",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<nav aria-label=\"예시 탐색\"><a class=\"ds-current\" aria-current=\"page\" href=\"#preview\">결과</a></nav>",
+      "css": ".ds-current{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;padding:12px 20px;border:0;border-radius:0;border-bottom:3px solid var(--accent,#245ec7);background:#fff;color:var(--accent,#245ec7);font-weight:600;}.ds-current:focus-visible{outline:3px solid #527dde;outline-offset:3px;}"
+    },
+    {
+      "name": "Supporting container",
+      "kind": "card",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<section class=\"ds-support\"><p>작업 정보</p></section>",
+      "css": ".ds-support{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;color:var(--ink,#20252d);border:1px solid var(--line,#d7dde5);border-radius:8px;padding:14px;background:#fff;}"
+    },
+    {
+      "name": "Empty state",
+      "kind": "custom",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<p class=\"ds-empty\">아직 표시할 기록이 없습니다.</p>",
+      "css": ".ds-empty{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;color:var(--muted,#535e6c);}"
+    },
+    {
+      "name": "Record row",
+      "kind": "custom",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<article class=\"ds-row\"><strong>기록 제목</strong><p>상태와 다음 작업을 확인하세요.</p></article>",
+      "css": ".ds-row{font:16px/1.65 system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", \"Malgun Gothic\", sans-serif;padding:20px 0;border-bottom:1px solid var(--line,#d7dde5);color:var(--ink,#20252d);}.ds-row p{color:var(--muted,#535e6c);}"
+    },
+    {
+      "name": "JSON surface",
+      "kind": "custom",
+      "description": "Extracted from portfolio-demo/src/styles.css.",
+      "html": "<pre class=\"ds-json\"><code>{\"status\": \"example\"}</code></pre>",
+      "css": ".ds-json{background:var(--code-bg,#20252d);color:var(--code-ink,#e9eef6);font:13px/1.65 ui-monospace,\"SFMono-Regular\",Menlo,Consolas,monospace;padding:20px;border-radius:0 0 8px 8px;overflow:auto;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "장애 진단 콘솔",
+    "overview": "White request controls and graphite JSON surfaces distinguish input from response. Blue marks execution and the selected response tab. Recent requests and popularity follow the main experiment; contract details remain expandable reference material.",
+    "keyCharacteristics": [
+      "Task-first hierarchy",
+      "Explicit environment and state",
+      "Source-based components"
+    ],
+    "rules": [],
+    "dos": [
+      "Preserve route and field contracts.",
+      "Keep focus visible."
+    ],
+    "donts": [
+      "Do not imply production success from synthetic state.",
+      "Do not claim visual verification without rendering."
+    ]
+  }
+}

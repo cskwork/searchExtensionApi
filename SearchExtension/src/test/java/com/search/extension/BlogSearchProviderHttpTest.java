@@ -76,7 +76,7 @@ public class BlogSearchProviderHttpTest {
 	}
 
 	@Test
-	void naverRequestMapsSortAndPassesPageAsStart() {
+	void naverRequestMapsSortAndCalculatesDocumentOffset() {
 		NaverBlogSearchServiceImpl naver = new NaverBlogSearchServiceImpl();
 		ReflectionTestUtils.setField(naver, "apiEndpoint", "/v1/search/blog");
 		ReflectionTestUtils.setField(naver, "naverApiWebClient", stubClient(fixture("naver-blog-response.json")));
@@ -86,8 +86,8 @@ public class BlogSearchProviderHttpTest {
 		Map<String, String> query = queryOf(requests.get(0));
 		assertEquals("/v1/search/blog", requests.get(0).getPath());
 		assertEquals("date", query.get("sort"));
-		// 기존 동작: 외부 page 값을 네이버 start(시작 문서 위치)에 그대로 전달
-		assertEquals("3", query.get("start"));
+		// page 3, size 10 starts at document 21; pages no longer overlap
+		assertEquals("21", query.get("start"));
 		assertEquals("10", query.get("display"));
 
 		assertEquals(3, result.get("currentPage"));

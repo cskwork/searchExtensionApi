@@ -2,27 +2,27 @@
 
 ## 2026-09 개선 사항과 API 탐색기
 
-이 저장소의 원본은 `SearchExtension` 의 Java 17 / Spring Boot 3.1.1 백엔드입니다. 2026-09 작업에서는 공개 계약(엔드포인트, 파라미터, 응답 형식, 오류 코드)을 그대로 두고 아래만 바꿨습니다.
+이 저장소의 원본은 `SearchExtension` 의 Java 17 / Spring Boot 3.1.1 백엔드입니다. 2026-09 작업에서는 두 엔드포인트와 응답 형식·오류 코드를 유지하며 검색 처리와 실제 서버 연결을 보완했습니다. 운영 전환과 재현 방법은 [NATIVE-RUNBOOK.md](NATIVE-RUNBOOK.md)에 있습니다.
 
 ### Java 백엔드: 바뀐 것
 
 | 파일 | 변경 |
 |------|------|
 | `ApiSearchController` | `PageRequest.of(page, pageSize)` 보다 먼저 `ExceptionHandlerUtil.isValidParameter` 를 호출합니다. 전에는 `page=-1`, `pageSize=0`, `pageSize=-5` 가 `PageRequest` 의 `IllegalArgumentException` 으로 500 이 됐고, 이제는 기존 `INVALID_PARAMETER_PAGE`(402)로 응답합니다. `page` 는 전과 같이 1부터 시작하는 외부 페이지 번호로 전달합니다. |
-| `GlobalExceptionHandler` | `page`, `pageSize` 에 숫자가 아닌 값이 오면(`MethodArgumentTypeMismatchException`) 500 대신 `INVALID_PARAMETER_PAGE`(402)로 응답합니다. 다른 예외 처리는 그대로입니다. |
+| `GlobalExceptionHandler` | `page`, `pageSize` 에 숫자가 아닌 값이 오면(`MethodArgumentTypeMismatchException`) 500 대신 `INVALID_PARAMETER_PAGE`(402)로 응답합니다. 일반 서버 오류는 내부 예외 내용을 노출하지 않습니다. |
 | `build.gradle` | 기본 `test` 에서 `integration` 태그를 빼고, 실제 API 를 부르는 테스트용 `integrationTest` 태스크를 추가했습니다. |
 | `TestKakaoApiSearchBlog`, `TestNaverApiSearchBlog` | 소스에 적혀 있던 키를 지우고 환경 변수로 받는 opt-in JUnit 테스트로 바꿨습니다. 기본 빌드에서는 실행하지 않습니다. |
 | `SearchExtensionApplicationTests` | 테스트가 인메모리 H2 와 자리표시자 키만 쓰는지 확인하는 테스트를 추가했습니다. |
 
 새 테스트: `ApiSearchControllerContractTest`(파라미터 계약 18개), `ApiBlogSearchServiceFallbackTest`(카카오 → 네이버 대체와 실패 코드), `BlogSearchProviderHttpTest`(로컬 HTTP 스텁으로 요청 매핑과 응답 가공 확인). 테스트 전용 설정 `src/test/resources/application.properties` 는 실제 키를 읽지 않고, 홈 디렉터리에 H2 파일을 만들지 않습니다.
 
-### Java 백엔드: 그대로인 것
+### 검색 처리와 실행 구성
 
-서비스(`ApiBlogSearchServiceImpl`, `KakaoBlogSearchServiceImpl`, `NaverBlogSearchServiceImpl`), DTO, `ErrorResponse` 코드와 HTTP 상태(401/402/501 포함), 리포지터리, 스케줄러, 서킷브레이커 설정, `application.properties`, `jar/` 의 기존 jar 는 바꾸지 않았습니다.
-
-그대로 둔 동작 중 확인이 필요한 것:
-- 네이버 요청의 `start` 에 외부 `page` 값을 그대로 넣습니다. 네이버 `start` 는 시작 문서 위치라서 2페이지 이상에서는 결과가 겹칩니다. 공급자 매핑을 유지하라는 범위에 따라 고치지 않고 테스트로 현재 동작을 고정했습니다.
-- 서킷브레이커는 `IOException`, `TimeoutException` 만 실패로 기록하므로 HTTP 오류 응답으로는 열리지 않습니다. 대체 호출(`recoverWith`)은 모든 예외에서 일어납니다.
+- 네이버 `start`는 `(page - 1) * pageSize + 1`로 계산해 페이지 중복을 고쳤습니다. 1000을 넘는 시작 위치는 기존 402 오류로 거절합니다.
+- 공급자 요청에 시간 제한을 적용했습니다. 공급자 선택 후 검색 기록을 저장하므로 DB 실패가 다른 공급자 호출을 일으키지 않습니다.
+- 인기 검색어 집계의 삭제·삽입을 하나의 거래로 묶고 스케줄러를 단일 작업으로 등록했습니다.
+- 기본 설정은 격리된 H2와 loopback 주소를 사용합니다. 과거 실행 JAR와 DB 파일은 Git 및 새 실행 JAR에서 제외하고, 현재 소스에서 다시 빌드합니다.
+- 검증: Java 40개, 탐색기 단위 54개, 데모 DOM 33개, 실제 연결 모드 DOM 11개. 실제 Spring HTTP 엔드포인트는 loopback 공급자와 H2로 검사했습니다. 브라우저 화면과 운영 공급자는 검증하지 않았습니다.
 
 ### API 탐색기 (`portfolio-demo/`)
 
@@ -31,7 +31,7 @@
 - `scripts/extract-contract.mjs` 가 원본 컨트롤러, 서비스, DTO, `ErrorResponse`, `ApiConstants`, 테스트 fixture 에서 계약을 추출해 `src/generated/contract.js` 를 만듭니다. `application.properties` 는 읽지 않습니다.
 - `src/mock-adapter.js` 가 컨트롤러 → 서비스 → 카카오/네이버 순서를 브라우저 안에서 재현합니다. 응답 봉투, HTTP 상태, 공급자별 결과 형식은 추출한 계약을 따릅니다.
 - 모의 경계: 외부 검색 API 는 호출하지 않습니다. 검색 문서는 질의어로 만든 모의 데이터이고 링크 필드는 비워 둡니다. 인기 검색어는 이 브라우저의 localStorage 에만 저장합니다(초기화, 손상 값 복구 포함).
-- Java 백엔드는 Vercel 에 배포하지 않습니다. 배포 대상은 `portfolio-demo/dist` 의 탐색기와 모의 어댑터 파일 7개뿐입니다.
+- Java 백엔드는 Vercel 에 배포하지 않습니다. 공개 정적 산출물은 `portfolio-demo/dist`의 허용 목록 10개 파일입니다. 실제 서버 빌드는 같은 탐색기의 `live.html`을 `/console/`에 포함해 원본 API로 연결합니다.
 - `SearchExtension/src/test/resources/contract/search-parameter-cases.json` 은 Java 계약 테스트와 모의 어댑터 테스트가 함께 씁니다.
 
 ### 실행 방법
@@ -44,26 +44,17 @@ sh ./gradlew build
 SEARCH_API_LIVE_TESTS=true KAKAO_API_KEY=... NAVER_CLIENT_ID=... NAVER_CLIENT_SECRET=... sh ./gradlew integrationTest   # 실제 API (선택)
 
 # API 탐색기 (Node 20+)
-cd portfolio-demo
-npm test
+cd ../portfolio-demo
+npm ci
+npm run test:all
 npm run build                # 계약 최신 여부 확인 후 dist/ 생성
 npm run extract              # 원본 Java 를 바꾼 뒤 계약 다시 생성
 ```
 
 ---
 
-1) 프로젝트 설명 하단
-2) 다운로드 링크
-	
- 	- https://github.com/cskwork/searchCustomizer/raw/main/SearchExtension/jar/SearchExtension-0.0.1-SNAPSHOT.jar
-3) 빌드 실행 (JDK 17 이상 사용 (Spring Boot 3.0 이상 호환 - https://jdk.java.net/java-se-ri/17)
-```bash
-java -jar SearchExtension-0.0.1-SNAPSHOT.jar
-```
-4) 실행 URL
-	- http://localhost:8080/search?query=abc&sort=accuracy&page=1&pageSize=10
-	- http://localhost:8080/popularKeyword
-	
+로컬 실행은 소스에서 만든 `SearchExtension/build/libs/SearchExtension-0.0.1-SNAPSHOT.jar`를 사용합니다. 가상 공급자 실행과 환경 변수는 `NATIVE-RUNBOOK.md`의 명령을 따릅니다. API 경로는 `/search`와 `/popularKeyword`, 실제 연결 화면은 `/console/live.html`입니다.
+
 ====================================================
 
 ## 목차
