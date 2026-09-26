@@ -27,4 +27,4 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Verification boundary
 
-원본 기반 자동 검사와 새로운 역할별 실패/저장/권한 경계를 검사한다. 사용자 지시로 새 브라우저 캡처와 실제 화면 판정은 보류되며 코드 검토를 시각 통과로 표현하지 않는다. 새 장식 이미지는 필요하지 않다. 기능 원본이 없는 부분은 새 호환 구현으로 기록한다. 완성 뒤 실제 토큰에 근거한 DESIGN.md와 .impeccable/design.json을 작성한다.
+원본 기반 자동 검사와 새로운 역할별 실패/저장/권한 경계를 검사한다. 2026-09-26 작업대 개선은 jsdom 검사로 확인했고 실제 화면 판정은 root의 데스크톱/모바일 캡처 검토에 맡긴다. 코드 검토를 시각 통과로 표현하지 않는다. 새 장식 이미지는 필요하지 않다. 기능 원본이 없는 부분은 새 호환 구현으로 기록한다. 완성 뒤 실제 토큰에 근거한 DESIGN.md와 .impeccable/design.json을 작성한다.
