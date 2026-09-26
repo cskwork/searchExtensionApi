@@ -1,0 +1,23 @@
+{
+  "description": "GET /search 파라미터 계약 케이스. ApiSearchControllerContractTest(Java)와 portfolio-demo 모의 어댑터 테스트(JS)가 같은 파일을 사용합니다.",
+  "cases": [
+    { "name": "default-page-and-size", "params": { "query": "spring" }, "status": 200, "sort": "accuracy", "page": 1, "pageSize": 10 },
+    { "name": "recency-sort", "params": { "query": "spring", "sort": "recency" }, "status": 200, "sort": "recency", "page": 1, "pageSize": 10 },
+    { "name": "lower-boundary", "params": { "query": "spring", "page": "1", "pageSize": "1" }, "status": 200, "sort": "accuracy", "page": 1, "pageSize": 1 },
+    { "name": "upper-boundary", "params": { "query": "spring", "page": "50", "pageSize": "50" }, "status": 200, "sort": "accuracy", "page": 50, "pageSize": 50 },
+    { "name": "empty-page-uses-default", "params": { "query": "spring", "page": "", "pageSize": "" }, "status": 200, "sort": "accuracy", "page": 1, "pageSize": 10 },
+    { "name": "missing-query", "params": {}, "status": 400, "error": "INVALID_NULL_PARAMETER" },
+    { "name": "blank-query", "params": { "query": "   " }, "status": 400, "error": "INVALID_NULL_PARAMETER" },
+    { "name": "invalid-sort", "params": { "query": "spring", "sort": "popular" }, "status": 401, "error": "INVALID_PARAMETER_SORT" },
+    { "name": "invalid-sort-before-page", "params": { "query": "spring", "sort": "popular", "page": "-1" }, "status": 401, "error": "INVALID_PARAMETER_SORT", "previousStatus": 500 },
+    { "name": "page-zero", "params": { "query": "spring", "page": "0" }, "status": 402, "error": "INVALID_PARAMETER_PAGE" },
+    { "name": "page-above-max", "params": { "query": "spring", "page": "51" }, "status": 402, "error": "INVALID_PARAMETER_PAGE" },
+    { "name": "negative-page", "params": { "query": "spring", "page": "-1" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 },
+    { "name": "page-size-zero", "params": { "query": "spring", "pageSize": "0" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 },
+    { "name": "negative-page-size", "params": { "query": "spring", "pageSize": "-5" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 },
+    { "name": "page-size-above-max", "params": { "query": "spring", "pageSize": "51" }, "status": 402, "error": "INVALID_PARAMETER_PAGE" },
+    { "name": "non-numeric-page", "params": { "query": "spring", "page": "two" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 },
+    { "name": "non-numeric-page-size", "params": { "query": "spring", "pageSize": "1.5" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 },
+    { "name": "type-error-before-missing-query", "params": { "page": "two" }, "status": 402, "error": "INVALID_PARAMETER_PAGE", "previousStatus": 500 }
+  ]
+}

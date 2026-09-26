@@ -1,0 +1,88 @@
+// Node/jsdom only. Test dependency; no browser, network or rendering.
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import vm from 'node:vm';
+import { CONTRACT } from '../src/generated/contract.js';
+import { createSearchApi } from '../src/mock-adapter.js';
+import { createKeywordStore, STORAGE_KEY } from '../src/keyword-store.js';
+import { createExplorerState, DEFAULT_DRAFT, EXPLORER_KEY } from '../src/explorer-state.js';
+const { JSDOM }=createRequire(import.meta.url)(process.env.JSDOM_PATH || 'jsdom');
+const html=readFileSync(new URL('../src/index.html',import.meta.url),'utf8');
+const code=readFileSync(new URL('../src/app.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');
+function memory() {const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};}
+let checks=0;
+function ok(condition,label) { assert.ok(condition,label);checks++;console.log('ok',label); }
+function mount(storage=memory()) {
+  const dom=new JSDOM(html,{url:'https://local.invalid',runScripts:'outside-only'}),w=dom.window;
+  const calls=[]; w.matchMedia=()=>({matches:true});w.HTMLElement.prototype.scrollIntoView=function(){w.__scrolled=this.id;};
+  Object.assign(w,{CONTRACT,DEFAULT_DRAFT,createKeywordStore:()=>createKeywordStore(storage),createExplorerState:()=>createExplorerState(storage),createSearchApi:opts=>{
+    const api=createSearchApi(opts);return {...api,search:(...args)=>{calls.push(args);return api.search(...args);}};
+  }});
+  vm.runInContext(code,dom.getInternalVMContext());
+  const $=id=>w.document.getElementById(id),click=selector=>w.document.querySelector(selector).click();
+  const body=()=>JSON.parse($('json-view').textContent),count=()=>JSON.parse(storage.getItem(STORAGE_KEY)||'{"entries":[]}').entries.reduce((n,e)=>n+e[1],0);
+  return {dom,w,$,click,body,count,calls,storage};
+}
+const backend=memory();let a=mount(backend);
+ok(a.calls.length===0 && a.count()===0,'initial load performs no search');
+a.click('[data-scenario=normal]');ok(a.body().message==='Success' && a.$('status').textContent.includes('HTTP 200'),'normal scenario executes');
+ok(a.count()===1 && a.$('result-list').children.length===10,'normal increments once and renders result items');
+ok(a.w.document.activeElement.id==='response-title' && a.w.__scrolled==='response-title','execution focuses response before supporting data');
+a.click('[data-scenario=fallback]');ok(a.$('status').textContent.includes('Naver') && a.count()===2,'fallback scenario uses Naver');
+a.click('[data-scenario=failure]');ok(a.$('status').textContent.includes('HTTP 501') && a.count()===2,'both-down failure retains original status without counting');
+const failureBody=a.body();a.click('#tab-json');ok(!a.$('panel-json').hidden && a.$('panel-results').hidden,'JSON tab click changes visible pane');
+a.click('#tab-trace');ok(!a.$('panel-trace').hidden && a.$('trace').children.length>0,'trace tab uses actual response trace');
+a.$('tab-trace').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
+ok(a.w.document.activeElement.id==='tab-results' && a.$('tab-results').getAttribute('aria-selected')==='true','arrow key wraps and updates focus/selection');
+a.$('tab-results').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'End',bubbles:true}));
+ok(a.w.document.activeElement.id==='tab-trace','End selects last tab');
+a.$('tab-trace').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'Home',bubbles:true}));
+ok(a.w.document.activeElement.id==='tab-results','Home selects first tab');
+ok(a.count()===2 && a.calls.length===3,'tab browsing never executes or increments');
+a.dom.window.close();a=mount(backend);
+ok(a.calls.length===0 && a.count()===2,'reload preserves counts without automatic search');
+ok(a.w.document.querySelector('[name=kakao]:checked').value==='down' && a.w.document.querySelector('[name=naver]:checked').value==='down','reload restores failed provider configuration');
+ok(a.$('history-list').children.length===3 && a.$('status').textContent.includes('요청을 보내면'),'recent history restored with no stale active response');
+a.click('#history-list li:first-child button:first-child');ok(a.calls.length===0 && a.count()===2,'history load only restores form');
+a.click('#history-list li:first-child button:last-child');ok(a.$('status').textContent.includes('HTTP 501') && a.count()===2,'failed history replays with saved providers');
+assert.deepEqual(a.body(),failureBody);
+a.click('#recover-request');ok(a.$('status').textContent.includes('HTTP 200') && a.count()===3,'failure recovery executes normal settings once');
+a.click('[data-scenario=invalid]');ok(a.$('status').textContent.includes('HTTP 402') && a.count()===3,'invalid-input scenario preserves original contract');
+a.click('#recover-request');ok(a.$('page').value==='1' && a.count()===4,'invalid input recovery repairs params and executes');
+a.$('query').value='draft only';a.$('query').dispatchEvent(new a.w.Event('input',{bubbles:true}));
+a.w.document.querySelector('[name=kakao][value=down]').click();
+a.click('#next-page');
+ok(a.$('query').value==='spring boot' && a.$('page').value==='2' && a.$('status').textContent.includes('Kakao'),'paging uses displayed response settings, not changed draft');
+ok(a.count()===5,'explicit next page counts exactly once');
+a.click('#popular-json');ok(!a.$('panel-json').hidden && a.count()===5,'popular JSON is read-only and opens JSON tab');
+const calls=a.calls.length;a.click('#next-page');ok(a.calls.length===calls,'popular response disables previous search pagination');
+a.click('#run-cases');ok(a.$('case-summary').textContent.includes('18개 중 18개') && a.count()===5,'contract cases do not count as searches');
+const historic=a.$('history-list').children.length;ok(historic===5,'history stays bounded to five');
+a.click('#history-clear');ok(a.$('history-list').children.length===0 && a.count()===5,'history clear preserves keyword counts');
+a.$('query').value='saved draft';a.$('query').dispatchEvent(new a.w.Event('input',{bubbles:true}));a.dom.window.close();a=mount(backend);
+ok(a.$('query').value==='saved draft' && a.calls.length===0 && a.count()===5,'unsent draft restores without counting');
+a.dom.window.close();backend.setItem(EXPLORER_KEY,'{broken');a=mount(backend);
+ok(!a.$('history-alert').hidden && a.$('query').value==='spring boot' && a.count()===5,'corrupt explorer storage recovers independently from keyword stats');
+a.dom.window.close();
+const blocked={getItem(){throw Error('denied')},setItem(){throw Error('denied')},removeItem(){throw Error('denied')}};
+a=mount(blocked);a.click('[data-scenario=normal]');ok(!a.$('history-alert').hidden && a.$('history-list').children.length===1 && a.$('status').textContent.includes('HTTP 200'),'blocked storage keeps working in memory');a.dom.window.close();
+const b=mount();b.click('[data-scenario=fallback]');
+b.$('pageSize').value='';b.$('search-form').dispatchEvent(new b.w.Event('submit',{bubbles:true,cancelable:true}));
+b.click('#next-page');
+ok(b.$('pageSize').value==='' && !b.$('request-line').textContent.includes('pageSize='),'paging preserves omitted parameter intent');
+const before=b.count();b.click('#history-list li:first-child button:last-child');
+ok(b.count()===before+1 && b.$('page').value==='2' && b.$('status').textContent.includes('Naver'),'successful history replay restores providers/page and counts once');
+const saved=b.storage;b.dom.window.close();const c=mount(saved);
+ok(c.calls.length===0 && c.count()===before+1 && c.$('page').value==='2' && c.$('pageSize').value==='','successful request draft reload never re-executes');
+c.dom.window.close();
+{const r=mount();const steps=()=>[...r.w.document.querySelectorAll('#route-flow .route-step')].map(li=>li.className.replace('route-step ','')+':'+li.querySelector('.route-state').textContent);
+ok(steps().join('|')==='request:GET /search|ready:정상 설정|ready:정상 설정|ready:요청 대기','ready route reflects configured providers without a request');
+r.w.document.querySelector('[name=kakao][value=down]').click();r.w.document.querySelector('[name=kakao][value=down]').dispatchEvent(new r.w.Event('change',{bubbles:true}));ok(steps()[1]==='down:장애 설정','route follows provider setting before execution');
+r.click('[data-scenario=normal]');ok(steps()[1]==='served:응답 제공'&&steps()[2]==='idle:호출하지 않음'&&steps()[3].startsWith('served:HTTP 200'),'normal route: Kakao served, Naver not called');
+r.click('[data-scenario=fallback]');ok(steps()[1]==='down:장애 설정'&&steps()[2]==='served:응답 제공','fallback route: configured outage then Naver served');
+r.click('[data-scenario=failure]');ok(steps()[1]==='down:장애 설정'&&steps()[2]==='down:장애 설정'&&steps()[3].startsWith('down:HTTP 5'),'total failure route ends in an error status');
+ok(!/ms|초|지연|latency/.test(r.$('route-flow').textContent),'route shows no invented timing');
+const legend=[...r.w.document.querySelectorAll('#history-sources .source-legend li')].map(li=>li.textContent);ok(!r.$('history-sources').hidden&&legend.includes('Kakao 1건')&&legend.includes('Naver 1건')&&legend.includes('응답 없음 1건'),'history source distribution counts recorded providers');
+ok(r.w.document.querySelectorAll('#history-sources rect').length===3,'distribution bar has one segment per provider');r.dom.window.close();}
+console.log(`DOM: ${checks} checks passed; no browser/rendering involved.`);

@@ -1,0 +1,27 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "portfolio-demo/src/index.html"
+        ],
+        "createdAt": "2026-09-26T08:56:41.800Z",
+        "reason": "Codex review: production computed styles show open white sections on the same white page; the only dividers have 28px right or 24px top padding. No text is flush against a visible boundary."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "portfolio-demo/src/styles.css"
+        ],
+        "createdAt": "2026-09-26T09:57:50.860Z",
+        "reason": "Codex review: production response tab buttons have border-radius 0px and a 3px active underline; rounded JSON containers on the same minified line are different elements."
+      }
+    ]
+  }
+}

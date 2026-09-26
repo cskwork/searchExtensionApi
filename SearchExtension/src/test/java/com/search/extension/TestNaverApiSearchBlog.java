@@ -12,14 +12,30 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.extension.apiSearch.domain.model.NaverBlogSearchResultDTO;
 
+/**
+ * 실제 네이버 API 를 호출하는 opt-in 통합 테스트 (기본 test 태스크에서 제외)
+ * 실행: SEARCH_API_LIVE_TESTS=true NAVER_CLIENT_ID=... NAVER_CLIENT_SECRET=... ./gradlew integrationTest
+ */
+@Tag("integration")
+@EnabledIfEnvironmentVariable(named = "SEARCH_API_LIVE_TESTS", matches = "true")
 public class TestNaverApiSearchBlog {
 
-	public static void main(String[] args) {
-		String clientId = "Mof6ggxXwPDAVSak9SWM"; // 애플리케이션 클라이언트 아이디
-		String clientSecret = "12bMrnLfyH"; // 애플리케이션 클라이언트 시크릿
+	@Test
+	void searchBlogMapsToDto() throws Exception {
+		String clientId = System.getenv("NAVER_CLIENT_ID"); // 애플리케이션 클라이언트 아이디 (환경 변수)
+		String clientSecret = System.getenv("NAVER_CLIENT_SECRET"); // 애플리케이션 클라이언트 시크릿 (환경 변수)
+		assertTrue(clientId != null && !clientId.isBlank(), "NAVER_CLIENT_ID 환경 변수가 필요합니다.");
+		assertTrue(clientSecret != null && !clientSecret.isBlank(), "NAVER_CLIENT_SECRET 환경 변수가 필요합니다.");
 
 		String text = null;
 		try {
@@ -39,27 +55,25 @@ public class TestNaverApiSearchBlog {
 
 		System.out.println(responseBody);
 
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			NaverBlogSearchResultDTO dataDTO = objectMapper.readValue(responseBody, NaverBlogSearchResultDTO.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		NaverBlogSearchResultDTO dataDTO = objectMapper.readValue(responseBody, NaverBlogSearchResultDTO.class);
+		assertNotNull(dataDTO.getItems(), "items 매핑 실패");
+		assertTrue(dataDTO.getDisplay() >= 0, "display 매핑 실패");
 
-			// Access the mapped data
-			System.out.println("Last Build Date: " + dataDTO.getLastBuildDate());
-			System.out.println("Total: " + dataDTO.getTotal());
-			System.out.println("Start: " + dataDTO.getStart());
-			System.out.println("Display: " + dataDTO.getDisplay());
+		// Access the mapped data
+		System.out.println("Last Build Date: " + dataDTO.getLastBuildDate());
+		System.out.println("Total: " + dataDTO.getTotal());
+		System.out.println("Start: " + dataDTO.getStart());
+		System.out.println("Display: " + dataDTO.getDisplay());
 
-			for (NaverBlogSearchResultDTO.Item item : dataDTO.getItems()) {
-				System.out.println("Title: " + item.getTitle());
-				System.out.println("Link: " + item.getLink());
-				System.out.println("Description: " + item.getDescription());
-				System.out.println("Blogger Name: " + item.getBloggername());
-				System.out.println("Blogger Link: " + item.getBloggerlink());
-				System.out.println("Post Date: " + item.getPostdate());
-				System.out.println("----------------------");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (NaverBlogSearchResultDTO.Item item : dataDTO.getItems()) {
+			System.out.println("Title: " + item.getTitle());
+			System.out.println("Link: " + item.getLink());
+			System.out.println("Description: " + item.getDescription());
+			System.out.println("Blogger Name: " + item.getBloggername());
+			System.out.println("Blogger Link: " + item.getBloggerlink());
+			System.out.println("Post Date: " + item.getPostdate());
+			System.out.println("----------------------");
 		}
 	}
 

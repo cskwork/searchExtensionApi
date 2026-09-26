@@ -12,13 +12,28 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
 
+/**
+ * 실제 카카오 API 를 호출하는 opt-in 통합 테스트 (기본 test 태스크에서 제외)
+ * 실행: SEARCH_API_LIVE_TESTS=true KAKAO_API_KEY=... ./gradlew integrationTest
+ */
+@Tag("integration")
+@EnabledIfEnvironmentVariable(named = "SEARCH_API_LIVE_TESTS", matches = "true")
 public class TestKakaoApiSearchBlog {
 
-	public static void main(String[] args) {
-		String clientSecret = "49fbcd7b6f86a260c59e50df210a6eaa"; // 애플리케이션 클라이언트 시크릿
+	@Test
+	void searchBlogMapsToDto() throws Exception {
+		String clientSecret = System.getenv("KAKAO_API_KEY"); // 애플리케이션 REST API 키 (환경 변수)
+		assertTrue(clientSecret != null && !clientSecret.isBlank(), "KAKAO_API_KEY 환경 변수가 필요합니다.");
 
 		String text = null;
 		try {
@@ -35,26 +50,24 @@ public class TestKakaoApiSearchBlog {
 
 		System.out.println(responseBody);
 
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			KakaoBlogSearchResultDTO dataDTO = objectMapper.readValue(responseBody, KakaoBlogSearchResultDTO.class);
+		ObjectMapper objectMapper = new ObjectMapper();
+		KakaoBlogSearchResultDTO dataDTO = objectMapper.readValue(responseBody, KakaoBlogSearchResultDTO.class);
+		assertNotNull(dataDTO.getMeta(), "meta 매핑 실패");
+		assertNotNull(dataDTO.getDocuments(), "documents 매핑 실패");
 
-			// Access the mapped data
-			System.out.println("Total Count: " + dataDTO.getMeta().getTotal_count());
-			System.out.println("Pageable Count: " + dataDTO.getMeta().getPageable_count());
-			System.out.println("Is End: " + dataDTO.getMeta().getIs_end());
+		// Access the mapped data
+		System.out.println("Total Count: " + dataDTO.getMeta().getTotal_count());
+		System.out.println("Pageable Count: " + dataDTO.getMeta().getPageable_count());
+		System.out.println("Is End: " + dataDTO.getMeta().getIs_end());
 
-			for (KakaoBlogSearchResultDTO.Document document : dataDTO.getDocuments()) {
-				System.out.println("Title: " + document.getTitle());
-				System.out.println("Contents: " + document.getContents());
-				System.out.println("URL: " + document.getUrl());
-				System.out.println("Blogname: " + document.getBlogname());
-				System.out.println("Thumbnail: " + document.getThumbnail());
-				System.out.println("Datetime: " + document.getDatetime());
-				System.out.println("----------------------");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (KakaoBlogSearchResultDTO.Document document : dataDTO.getDocuments()) {
+			System.out.println("Title: " + document.getTitle());
+			System.out.println("Contents: " + document.getContents());
+			System.out.println("URL: " + document.getUrl());
+			System.out.println("Blogname: " + document.getBlogname());
+			System.out.println("Thumbnail: " + document.getThumbnail());
+			System.out.println("Datetime: " + document.getDatetime());
+			System.out.println("----------------------");
 		}
 
 	}

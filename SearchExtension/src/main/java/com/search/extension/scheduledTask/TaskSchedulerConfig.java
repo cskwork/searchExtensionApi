@@ -12,6 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="search.scheduler.enabled",havingValue="true",matchIfMissing=true)
 @EnableScheduling
 @ComponentScan(basePackages = "com.search.extension.scheduledTask"
 			 , basePackageClasses = {
@@ -24,7 +25,7 @@ public class TaskSchedulerConfig implements SchedulingConfigurer {
 	@Bean
 	public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-		threadPoolTaskScheduler.setPoolSize(5);
+		threadPoolTaskScheduler.setPoolSize(1);
 		threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
 		return threadPoolTaskScheduler;
 	}
@@ -32,6 +33,7 @@ public class TaskSchedulerConfig implements SchedulingConfigurer {
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegister) {
 	    Runnable task = () -> updatePopularKeywordsTask.updatePopularKeywordDatabase();
-	    threadPoolTaskScheduler().scheduleAtFixedRate(task,Duration.ofSeconds(5));
+	    taskRegister.setScheduler(threadPoolTaskScheduler());
+        taskRegister.addFixedRateTask(task,Duration.ofSeconds(5).toMillis());
 	}
 }
