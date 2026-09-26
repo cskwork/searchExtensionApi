@@ -11,7 +11,7 @@
           "portfolio-demo/src/index.html"
         ],
         "createdAt": "2026-09-26T08:56:41.800Z",
-        "reason": "Assistant decided: styles.css final .panel removes all borders and uses white on white; .request alone adds a right divider with 28px right padding, removed below 860px. The reported base-panel left/right boundary is absent in the final cascade."
+        "reason": "Codex review: production computed styles show open white sections on the same white page; the only dividers have 28px right or 24px top padding. No text is flush against a visible boundary."
       },
       {
         "rule": "border-accent-on-rounded",
@@ -20,7 +20,7 @@
           "portfolio-demo/src/styles.css"
         ],
         "createdAt": "2026-09-26T09:57:50.860Z",
-        "reason": "Assistant decided: styles.css line 207 contains multiple selectors. The 3px bottom accent belongs only to .response-tabs button, which explicitly sets border:0 and border-radius:0. Rounded panels and controls do not receive this accent; it is an intentional square tab underline, not a rounded card border."
+        "reason": "Codex review: production response tab buttons have border-radius 0px and a 3px active underline; rounded JSON containers on the same minified line are different elements."
       }
     ]
   }
