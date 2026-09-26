@@ -14,8 +14,24 @@ const api = mode==='live'?createHttpApi({origin:location.origin}):createSearchAp
 const explorer = createExplorerState(undefined,{scope:mode==='demo'?'demo':'live:'+location.origin});
 let pending=null,requestSequence=0;
 function busy(value){$('cancel-request').hidden=!value;$('search-form').setAttribute('aria-busy',String(value));}
-function transportFailure(error){$('status').className='status error';$('status').textContent='연결 오류 · '+error.message;$('results').hidden=true;$('result-empty').hidden=false;$('result-empty').textContent='서버 연결 오류이며 API의 401/402/501 응답이 아닙니다. 모의 데이터로 바꾸지 않았습니다.';$('recover-request').hidden=false;renderTrace([error.kind||'network',error.message]);showJson({transportError:error.kind||'network',message:error.message});lastSearch=null;focusResponse();}
+function transportFailure(error){renderRoute({httpStatus:0,provider:null},null);$('status').className='status error';$('status').textContent='연결 오류 · '+error.message;$('results').hidden=true;$('result-empty').hidden=false;$('result-empty').textContent='서버 연결 오류이며 API의 401/402/501 응답이 아닙니다. 모의 데이터로 바꾸지 않았습니다.';$('recover-request').hidden=false;renderTrace([error.kind||'network',error.message]);showJson({transportError:error.kind||'network',message:error.message});lastSearch=null;focusResponse();}
 
+
+// Request route: provider states come from the simulated settings (demo) or only from the response format (live).
+// No latency, retry count or failover timing is shown because no response contains them.
+function providerKey(value) { const v = String(value || '').toLowerCase(); return v.includes('kakao') ? 'kakao' : v.includes('naver') ? 'naver' : null; }
+function renderRoute(response = null, providers = mode === 'live' ? null : providerState()) {
+  const served = response ? providerKey(response.provider) : null;
+  const step = (name, detail, tone) => el('li', { className: `route-step ${tone}` }, [el('span', { className: 'route-name', text: name }), el('span', { className: 'route-state', text: detail })]);
+  const provider = (key, name) => {
+    if (served === key) return step(name, mode === 'live' ? '응답 제공 · 문서 형식 기준' : '응답 제공', 'served');
+    if (!providers) return step(name, response ? '응답에 기록 없음' : '서버가 결정', 'unknown');
+    if (providers[key] === 'down') return step(name, '장애 설정', 'down');
+    return step(name, response ? '호출하지 않음' : '정상 설정', response ? 'idle' : 'ready');
+  };
+  const outcome = !response ? step('응답', '요청 대기', 'ready') : response.httpStatus === 200 ? step('응답', `HTTP 200 · ${response.provider}`, 'served') : step('응답', response.httpStatus ? `HTTP ${response.httpStatus}` : '연결 오류', 'down');
+  $('route-flow').replaceChildren(step('요청', 'GET /search', 'request'), provider('kakao', '카카오 · 1순위'), provider('naver', '네이버 · 대체'), outcome);
+}
 let lastSearch = null;
 const TAB_NAMES = ['results', 'json', 'trace'];
 
@@ -156,7 +172,7 @@ function clearResponse() {
   $('results').hidden = true; $('result-empty').hidden = false;
   $('result-empty').textContent = '설정만 불러왔습니다. 아직 요청을 실행하지 않았습니다.';
   $('recover-request').hidden = true;
-  renderTrace([]); showJson({}); activateTab('results');
+  renderTrace([]); showJson({}); activateTab('results'); renderRoute();
 }
 function renderHistoryAlert() {
   const messages = [];
@@ -178,6 +194,13 @@ function renderHistory() {
       el('div', { className: 'actions' }, [load, replay]),
     ]);
   }));
+  const counts = entries.reduce((m, e) => m.set(e.provider, (m.get(e.provider) || 0) + 1), new Map());
+  const tone = (name) => providerKey(name) || 'none';
+  // SVG from numeric widths and fixed class names only; parsed in HTML so no namespace URL is needed.
+  let x = 0; const bar = el('div', { className: 'source-bar-wrap' });
+  bar.innerHTML = '<svg class="source-bar" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">' + [...counts].map(([name, n]) => { const w = n / entries.length * 100, r = `<rect x="${x}" y="0" height="8" width="${w}" class="src-${tone(name)}"></rect>`; x += w; return r; }).join('') + '</svg>';
+  $('history-sources').replaceChildren(...(entries.length ? [el('p', { className: 'hint', text: `최근 ${entries.length}건의 응답 공급자` }), bar, el('ul', { className: 'source-legend' }, [...counts].map(([name, n]) => el('li', { className: 'src-' + tone(name), text: `${name} ${n}건` })))] : []));
+  $('history-sources').hidden = !entries.length;
   $('history-empty').hidden = !!entries.length; $('history-clear').disabled = !entries.length;
   renderHistoryAlert();
 }
@@ -189,7 +212,7 @@ function displaySearch(params,providers,response) {
   lastSearch = { params: { ...params }, providers: { ...providers }, response };
   renderStatus(response); $('request-line').textContent = response.request;
   $('response-context').textContent = mode==='live'?'실서버 · '+location.origin:`실행 설정 · 카카오 ${providers.kakao === 'up' ? '정상' : '장애'} / 네이버 ${providers.naver === 'up' ? '정상' : '장애'}`;
-  renderTrace(response.trace); renderResults(response); showJson(response.body);
+  renderTrace(response.trace); renderResults(response); showJson(response.body); renderRoute(response, mode === 'live' ? null : providers);
   $('result-empty').hidden = response.httpStatus === 200;
   $('result-empty').textContent = response.httpStatus === 200 ? '' : '요청이 실패했습니다. JSON 탭에서 원본 오류 응답을, 처리 흐름 탭에서 실패 단계를 확인하세요.';
   $('recover-request').hidden = response.httpStatus === 200;
@@ -344,11 +367,12 @@ $('recover-request').addEventListener('click', () => {
 });
 $('history-clear').addEventListener('click', () => { explorer.clearHistory(); renderHistory(); });
 for (const name of ['input', 'change']) $('search-form').addEventListener(name, () => { explorer.updateDraft(readDraft()); renderHistoryAlert(); });
+$('search-form').addEventListener('change', event => { if (!lastSearch && ['kakao', 'naver'].includes(event.target.name)) renderRoute(); });
 renderContract();
 const restored = explorer.snapshot();
 applyDraft(restored.draft);
 if (restored.history.length) { $('draft-note').textContent = '마지막 입력과 공급자 설정을 복원했습니다. 자동 실행하지 않았습니다.'; $('draft-note').hidden = false; }
-renderHistory(); renderStorageAlert(); renderPopular();
+renderHistory(); renderStorageAlert(); renderPopular(); renderRoute();
 
 $('cancel-request').addEventListener('click',()=>pending?.abort());
 if(mode==='live'){

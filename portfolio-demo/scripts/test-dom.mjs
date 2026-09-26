@@ -76,4 +76,13 @@ ok(b.count()===before+1 && b.$('page').value==='2' && b.$('status').textContent.
 const saved=b.storage;b.dom.window.close();const c=mount(saved);
 ok(c.calls.length===0 && c.count()===before+1 && c.$('page').value==='2' && c.$('pageSize').value==='','successful request draft reload never re-executes');
 c.dom.window.close();
+{const r=mount();const steps=()=>[...r.w.document.querySelectorAll('#route-flow .route-step')].map(li=>li.className.replace('route-step ','')+':'+li.querySelector('.route-state').textContent);
+ok(steps().join('|')==='request:GET /search|ready:정상 설정|ready:정상 설정|ready:요청 대기','ready route reflects configured providers without a request');
+r.w.document.querySelector('[name=kakao][value=down]').click();r.w.document.querySelector('[name=kakao][value=down]').dispatchEvent(new r.w.Event('change',{bubbles:true}));ok(steps()[1]==='down:장애 설정','route follows provider setting before execution');
+r.click('[data-scenario=normal]');ok(steps()[1]==='served:응답 제공'&&steps()[2]==='idle:호출하지 않음'&&steps()[3].startsWith('served:HTTP 200'),'normal route: Kakao served, Naver not called');
+r.click('[data-scenario=fallback]');ok(steps()[1]==='down:장애 설정'&&steps()[2]==='served:응답 제공','fallback route: configured outage then Naver served');
+r.click('[data-scenario=failure]');ok(steps()[1]==='down:장애 설정'&&steps()[2]==='down:장애 설정'&&steps()[3].startsWith('down:HTTP 5'),'total failure route ends in an error status');
+ok(!/ms|초|지연|latency/.test(r.$('route-flow').textContent),'route shows no invented timing');
+const legend=[...r.w.document.querySelectorAll('#history-sources .source-legend li')].map(li=>li.textContent);ok(!r.$('history-sources').hidden&&legend.includes('Kakao 1건')&&legend.includes('Naver 1건')&&legend.includes('응답 없음 1건'),'history source distribution counts recorded providers');
+ok(r.w.document.querySelectorAll('#history-sources rect').length===3,'distribution bar has one segment per provider');r.dom.window.close();}
 console.log(`DOM: ${checks} checks passed; no browser/rendering involved.`);
