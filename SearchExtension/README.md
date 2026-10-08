@@ -1,6 +1,20 @@
 # 블로그 검색 서비스
 
-1) 지원자 정보 : 2126-000513_채성국_서버 개발자
+## API credentials
+
+Set `KAKAO_API_KEY`, `NAVER_CLIENT_ID`, and `NAVER_CLIENT_SECRET` in the process environment before starting the application. Missing variables fail configuration instead of using embedded credentials. The manual Kakao/Naver examples require the same variables and fail before network access when missing.
+
+Example variable names only (supply newly rotated credentials privately):
+
+```bash
+export KAKAO_API_KEY="<your rotated Kakao key>"
+export NAVER_CLIENT_ID="<your Naver client ID>"
+export NAVER_CLIENT_SECRET="<your rotated Naver secret>"
+```
+
+Previously committed credentials must be revoked or rotated; changing files does not invalidate them or remove Git history.
+
+1) 지원자 정보 : [redacted application ID]_Applicant_서버 개발자
 2) 프로젝트 설명 하단
 3) 다운로드 링크
 	

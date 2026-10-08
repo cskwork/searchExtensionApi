@@ -18,7 +18,10 @@ import com.search.extension.apiSearch.domain.model.KakaoBlogSearchResultDTO;
 public class TestKakaoApiSearchBlog {
 
 	public static void main(String[] args) {
-		String clientSecret = "49fbcd7b6f86a260c59e50df210a6eaa"; // 애플리케이션 클라이언트 시크릿
+		String clientSecret = System.getenv("KAKAO_API_KEY");
+		if (clientSecret == null || clientSecret.isBlank()) {
+			throw new IllegalStateException("Set KAKAO_API_KEY before running this live API example");
+		} // 애플리케이션 클라이언트 시크릿
 
 		String text = null;
 		try {

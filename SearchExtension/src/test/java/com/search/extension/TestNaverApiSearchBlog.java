@@ -18,8 +18,14 @@ import com.search.extension.apiSearch.domain.model.NaverBlogSearchResultDTO;
 public class TestNaverApiSearchBlog {
 
 	public static void main(String[] args) {
-		String clientId = "Mof6ggxXwPDAVSak9SWM"; // 애플리케이션 클라이언트 아이디
-		String clientSecret = "12bMrnLfyH"; // 애플리케이션 클라이언트 시크릿
+		String clientId = System.getenv("NAVER_CLIENT_ID");
+		if (clientId == null || clientId.isBlank()) {
+			throw new IllegalStateException("Set NAVER_CLIENT_ID before running this live API example");
+		} // 애플리케이션 클라이언트 아이디
+		String clientSecret = System.getenv("NAVER_CLIENT_SECRET");
+		if (clientSecret == null || clientSecret.isBlank()) {
+			throw new IllegalStateException("Set NAVER_CLIENT_SECRET before running this live API example");
+		} // 애플리케이션 클라이언트 시크릿
 
 		String text = null;
 		try {
